@@ -7,7 +7,7 @@ public class Response {
     private int requestId;
     private int contractorId;
     private Date date;
-    private ContractorDetails contractorDetails;
+    private ClientDetails contractorDetails;
 
     public int getId() {
         return id;
@@ -41,11 +41,11 @@ public class Response {
         this.date = date;
     }
 
-    public ContractorDetails getContractorDetails() {
+    public ClientDetails getContractorDetails() {
         return contractorDetails;
     }
 
-    public void setContractorDetails(ContractorDetails contractorDetails) {
+    public void setContractorDetails(ClientDetails contractorDetails) {
         this.contractorDetails = contractorDetails;
     }
 }

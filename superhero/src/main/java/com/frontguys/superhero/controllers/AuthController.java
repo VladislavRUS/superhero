@@ -2,7 +2,9 @@ package com.frontguys.superhero.controllers;
 
 import com.frontguys.superhero.constants.ClientRoles;
 import com.frontguys.superhero.models.Client;
+import com.frontguys.superhero.models.ClientDetails;
 import com.frontguys.superhero.services.AuthService;
+import com.frontguys.superhero.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
-@CrossOrigin
+@CrossOrigin(value = "*")
 @RestController
 public class AuthController {
     @Autowired
     AuthService authService;
+    @Autowired
+    ClientService clientService;
 
     @RequestMapping(value = "/api/v1/register", method = RequestMethod.POST)
     public ResponseEntity<Object> register(@RequestBody Client newClient) {
@@ -51,7 +55,17 @@ public class AuthController {
         String token = authService.login(client);
 
         if (token != null) {
-            HashMap<String, String> result = new HashMap<>();
+            HashMap<String, Object> result = new HashMap<>();
+            Client clientByToken = clientService.getClientByToken(token);
+
+            ClientDetails clientDetails = new ClientDetails();
+            clientDetails.setId(clientByToken.getId());
+            clientDetails.setName(clientByToken.getName());
+            clientDetails.setInformation(clientByToken.getInformation());
+            clientDetails.setEmail(clientByToken.getEmail());
+            clientDetails.setRole(clientByToken.getRole());
+
+            result.put("clientDetails", clientDetails);
             result.put("token", token);
 
             return new ResponseEntity<>(result, HttpStatus.OK);

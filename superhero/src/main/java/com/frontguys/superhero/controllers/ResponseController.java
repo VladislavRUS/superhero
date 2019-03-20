@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-@CrossOrigin
+@CrossOrigin(value = "*")
 @RestController
 public class ResponseController {
     @Autowired

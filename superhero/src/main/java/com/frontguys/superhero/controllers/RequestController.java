@@ -4,7 +4,7 @@ import com.frontguys.superhero.constants.ClientRoles;
 import com.frontguys.superhero.models.Client;
 import com.frontguys.superhero.models.Request;
 import com.frontguys.superhero.models.Response;
-import com.frontguys.superhero.models.ContractorDetails;
+import com.frontguys.superhero.models.ClientDetails;
 import com.frontguys.superhero.services.ClientService;
 import com.frontguys.superhero.services.RequestService;
 import com.frontguys.superhero.services.ResponseService;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin
+@CrossOrigin(value = "*")
 @RestController
 public class RequestController {
     @Autowired
@@ -71,6 +71,22 @@ public class RequestController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @RequestMapping(value = "/api/v1/auth/requests/{id}/confirm", method = RequestMethod.POST)
+    public ResponseEntity<Object> confirmRequest(HttpServletRequest httpServletRequest, @PathVariable int id) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        if (ClientRoles.ADMIN.equals(role)) {
+            Request request = requestService.getRequestById(id);
+            request.setConfirmed(true);
+            requestService.updateRequest(id, request);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("You are not allowed to confirm requests", HttpStatus.FORBIDDEN);
+        }
+    }
+
     @RequestMapping(value = "/api/v1/auth/requests/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Object> updateRequest(@RequestBody Request newRequest, HttpServletRequest httpServletRequest, @PathVariable int id) {
         String token = httpServletRequest.getHeader("Authorization");
@@ -88,16 +104,6 @@ public class RequestController {
             if (request.getCustomerId() != client.getId()) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
-        }
-
-        if (ClientRoles.CUSTOMER.equals(role)) {
-            if (!request.isConfirmed() && newRequest.isConfirmed()) {
-                return new ResponseEntity<>("Not enough rights to change confirmed", HttpStatus.FORBIDDEN);
-            }
-        }
-
-        if (request.getCustomerId() != newRequest.getCustomerId()) {
-            return new ResponseEntity<>("Cannot change customer", HttpStatus.BAD_REQUEST);
         }
 
         newRequest.setResponseCount(request.getResponseCount());
@@ -128,10 +134,12 @@ public class RequestController {
         for (Response response: responses) {
             Client contractor = clientService.getClientById(response.getContractorId());
 
-            ContractorDetails contractorDetails = new ContractorDetails();
+            ClientDetails contractorDetails = new ClientDetails();
+            contractorDetails.setId(contractor.getId());
             contractorDetails.setEmail(contractor.getEmail());
             contractorDetails.setName(contractor.getName());
             contractorDetails.setInformation(contractor.getInformation());
+            contractorDetails.setRole(contractor.getRole());
             response.setContractorDetails(contractorDetails);
         }
 

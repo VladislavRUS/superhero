@@ -1,9 +1,19 @@
 package com.frontguys.superhero.models;
 
-public class ContractorDetails {
+public class ClientDetails {
+    private int id;
     private String email;
     private String name;
     private String information;
+    private String role;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -27,5 +37,13 @@ public class ContractorDetails {
 
     public void setInformation(String information) {
         this.information = information;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

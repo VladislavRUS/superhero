@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/constants/routes.dart';
 import 'package:superhero_flutter/store.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class LoginScreenState extends State<LoginScreen> {
 
     try {
       await ScopedModel.of<Store>(context).login(email, password);
-      Navigator.pushReplacementNamed(context, '/requests');
+      Navigator.pushReplacementNamed(context, Routes.REQUESTS);
     } catch (e){
       print(e);
     } finally {
@@ -54,6 +55,13 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  @override
+  void dispose() {
+    emailTextEditingController.dispose();
+    passwordTextEditingController.dispose();
+    super.dispose();
   }
 
   @override

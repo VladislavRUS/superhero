@@ -39,7 +39,7 @@ public class RequestDAO {
     }
 
     public void updateRequest(int requestId, Request request) {
-        String query = "update request set contractor_id = ?, description = ?, expiration_date = ?, is_confirmed = ?, response_count = ? where id = ?";
-        jdbcTemplate.update(query, request.getContractorId(), request.getDescription(), request.getExpirationDate(), request.isConfirmed(), request.getResponseCount(), requestId);
+        String query = "update request set contractor_id = ?, description = ?, expiration_date = ? where id = ?";
+        jdbcTemplate.update(query, request.getContractorId(), request.getDescription(), request.getExpirationDate(), requestId);
     }
 }
