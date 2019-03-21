@@ -9,9 +9,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-
-  TextEditingController emailTextEditingController = new TextEditingController();
-  TextEditingController passwordTextEditingController = new TextEditingController();
+  TextEditingController emailTextEditingController =
+      new TextEditingController();
+  TextEditingController passwordTextEditingController =
+      new TextEditingController();
   bool isLoading = false;
 
   @override
@@ -19,14 +20,6 @@ class LoginScreenState extends State<LoginScreen> {
     super.initState();
     emailTextEditingController.text = 'admin';
     passwordTextEditingController.text = 'admin';
-  }
-
-  void onEmailChange(text) {
-    emailTextEditingController.text = text;
-  }
-
-  void onPasswordChange(text) {
-    passwordTextEditingController.text = text;
   }
 
   void onSubmit() async {
@@ -37,8 +30,8 @@ class LoginScreenState extends State<LoginScreen> {
 
     try {
       await ScopedModel.of<Store>(context).login(email, password);
-      Navigator.pushReplacementNamed(context, Routes.REQUESTS);
-    } catch (e){
+      Navigator.pushReplacementNamed(context, Routes.APP);
+    } catch (e) {
       print(e);
     } finally {
       hideLoader();
@@ -68,33 +61,35 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: isLoading ? CircularProgressIndicator() : Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: emailTextEditingController,
-                  decoration: InputDecoration.collapsed(hintText: 'Email'),
-                  onChanged: onEmailChange,
+        child: isLoading
+            ? CircularProgressIndicator()
+            : Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextField(
+                          controller: emailTextEditingController,
+                          decoration:
+                              InputDecoration.collapsed(hintText: 'Email')),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextField(
+                          controller: passwordTextEditingController,
+                          decoration:
+                              InputDecoration.collapsed(hintText: 'Пароль')),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: onSubmit,
+                          child: Text('Войти'),
+                        )),
+                  ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: passwordTextEditingController,
-                  decoration: InputDecoration.collapsed(hintText: 'Пароль'),
-                  onChanged: onPasswordChange,
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: RaisedButton(onPressed: onSubmit, child: Text('Войти'),)
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:superhero_flutter/constants/routes.dart';
+import 'package:superhero_flutter/screens/app.dart';
 import 'package:superhero_flutter/screens/create_request.dart';
 import 'package:superhero_flutter/screens/detailed_request.dart';
 import 'package:superhero_flutter/screens/initial.dart';
 import 'package:superhero_flutter/screens/login.dart';
-import 'package:superhero_flutter/screens/requests.dart';
 import 'package:superhero_flutter/store.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   Store store = new Store();
 
-  runApp(ScopedModel(model: store, child: MyApp()));
+  runApp(ScopedModel(model: store, child: MainScreen()));
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Superhero',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -28,7 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         Routes.INITIAL: (context) => InitialScreen(),
         Routes.LOGIN: (context) => LoginScreen(),
-        Routes.REQUESTS: (context) => RequestsScreen(),
+        Routes.APP: (context) => AppScreen(),
         Routes.CREATE_REQUEST: (context) => CreateRequestScreen(),
         Routes.DETAILED_REQUEST: (context) => DetailedRequestScreen()
       },

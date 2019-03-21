@@ -22,7 +22,7 @@ public class RequestDAO {
     public Request getRequestById(int id) {
         String query = "select * from request where id = ?";
         try {
-            return (Request) jdbcTemplate.queryForObject(query, new Object[] { id }, requestRowMapper);
+            return (Request) jdbcTemplate.queryForObject(query, new Object[]{id}, requestRowMapper);
         } catch (Exception e) {
             return null;
         }
@@ -30,7 +30,7 @@ public class RequestDAO {
 
     public List<Request> getCustomerRequests(int customerId) {
         String query = "select * from request where customer_id = ?";
-        return jdbcTemplate.query(query, new Object[] { customerId }, requestRowMapper);
+        return jdbcTemplate.query(query, new Object[]{customerId}, requestRowMapper);
     }
 
     public void createRequest(Request request) {
@@ -41,5 +41,10 @@ public class RequestDAO {
     public void updateRequest(int requestId, Request request) {
         String query = "update request set contractor_id = ?, description = ?, expiration_date = ? where id = ?";
         jdbcTemplate.update(query, request.getContractorId(), request.getDescription(), request.getExpirationDate(), requestId);
+    }
+
+    public void confirmRequest(int requestId) {
+        String query = "update request set is_confirmed = true where id = ?";
+        jdbcTemplate.update(query, requestId);
     }
 }

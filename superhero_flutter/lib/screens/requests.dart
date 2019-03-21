@@ -39,10 +39,16 @@ class RequestsScreenState extends State<RequestsScreen> {
           var request = requests[index];
           var description = request.description;
           var expirationDate = request.expirationDate;
+          var responseCount = request.responseCount;
+          var isConfirmed = request.isConfirmed;
 
           return ListTile(
-              leading: Icon(Icons.description),
+              leading: Icon(
+                Icons.description,
+                color: isConfirmed ? Colors.green : Colors.grey,
+              ),
               title: Text(description),
+              trailing: Text(responseCount.toString()),
               subtitle: Text(expirationDate.toString()),
               onTap: () {
                 onListTileTap(requests[index]);
@@ -50,9 +56,10 @@ class RequestsScreenState extends State<RequestsScreen> {
         });
   }
 
-  onListTileTap(Request request) {
+  onListTileTap(Request request) async {
     ScopedModel.of<Store>(context).setDetailedRequest(request);
-    Navigator.pushNamed(context, Routes.DETAILED_REQUEST);
+    await Navigator.pushNamed(context, Routes.DETAILED_REQUEST);
+    init();
   }
 
   addRequest() async {
@@ -61,11 +68,11 @@ class RequestsScreenState extends State<RequestsScreen> {
   }
 
   canSeeActionButton(String role) {
-    if (role == Roles.CONTRACTOR) {
-      return false;
+    if (role == Roles.CUSTOMER) {
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   @override
@@ -77,16 +84,18 @@ class RequestsScreenState extends State<RequestsScreen> {
     return Scaffold(
       appBar: AppBar(
           title: ScopedModelDescendant<Store>(builder: (context, child, store) {
-        String title = 'Заявки (' +
-            (store.requests != null ? store.requests.length : 0).toString() +
-            ')';
+        String title = 'Заявки';
         return Text(title);
       })),
       body: RefreshIndicator(
           key: _refreshIndicatorKey, child: buildList(), onRefresh: init),
       floatingActionButton: isActionButtonAvailable
           ? FloatingActionButton(
-              child: Center(child: Icon(Icons.add)), onPressed: addRequest)
+              onPressed: addRequest,
+              child: Center(
+                child: Icon(Icons.add),
+              ),
+            )
           : null,
     );
   }

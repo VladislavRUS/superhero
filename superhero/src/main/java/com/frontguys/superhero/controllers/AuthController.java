@@ -60,10 +60,14 @@ public class AuthController {
 
             ClientDetails clientDetails = new ClientDetails();
             clientDetails.setId(clientByToken.getId());
-            clientDetails.setName(clientByToken.getName());
-            clientDetails.setInformation(clientByToken.getInformation());
             clientDetails.setEmail(clientByToken.getEmail());
             clientDetails.setRole(clientByToken.getRole());
+            clientDetails.setLegalEntity(clientByToken.isLegalEntity());
+            clientDetails.setFirstName(clientByToken.getFirstName());
+            clientDetails.setLastName(clientByToken.getLastName());
+            clientDetails.setCompanyName(clientByToken.getCompanyName());
+            clientDetails.setAddress(clientByToken.getAddress());
+            clientDetails.setAbout(clientByToken.getAbout());
 
             result.put("clientDetails", clientDetails);
             result.put("token", token);

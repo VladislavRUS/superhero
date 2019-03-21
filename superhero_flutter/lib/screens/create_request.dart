@@ -39,10 +39,6 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
     }
   }
 
-  onDescriptionChanged(text) {
-    descriptionFieldController.text = text;
-  }
-
   onSave() {
     if (descriptionFieldController.text == '' ||
         dateFieldController.text == '') {
@@ -110,7 +106,6 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
                   child: TextField(
                     controller: descriptionFieldController,
                     decoration: InputDecoration(labelText: 'Описание'),
-                    onChanged: onDescriptionChanged,
                   ),
                 )
               ],

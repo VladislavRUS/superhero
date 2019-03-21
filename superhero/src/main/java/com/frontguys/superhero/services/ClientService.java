@@ -2,6 +2,7 @@ package com.frontguys.superhero.services;
 
 import com.frontguys.superhero.dao.ClientDAO;
 import com.frontguys.superhero.models.Client;
+import com.frontguys.superhero.models.ClientDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,5 +16,9 @@ public class ClientService {
     }
     public Client getClientById(int id) {
         return clientDAO.getClientById(id);
+    }
+
+    public void updateClient(int id, ClientDetails clientDetails) {
+        clientDAO.updateClient(id, clientDetails);
     }
 }

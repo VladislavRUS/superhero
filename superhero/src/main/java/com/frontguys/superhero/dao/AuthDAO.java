@@ -39,13 +39,19 @@ public class AuthDAO {
     }
 
     public void register(Client client) {
-        String query = "insert into client (email, password, role) values (?, ?, ?)";
+        String query = "insert into client (email, password, role, is_legal_entity, first_name, last_name, company_name, address, about) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         String email = client.getEmail();
         String password = DigestUtils.sha256Hex(client.getPassword());
         String role = client.getRole();
+        boolean legalEntity = client.isLegalEntity();
+        String firstName = client.getFirstName();
+        String lastName = client.getLastName();
+        String companyName = client.getCompanyName();
+        String address = client.getAddress();
+        String about = client.getAbout();
 
-        jdbcTemplate.update(query, email, password, role);
+        jdbcTemplate.update(query, email, password, role, legalEntity, firstName, lastName, companyName, address, about);
     }
 
     public void saveToken(String token, int clientId) {

@@ -28,14 +28,8 @@ public class RequestService {
         requestDAO.updateRequest(requestId, request);
     }
 
-    public Request getRequestFromListById(List<Request> requests, int id) {
-        for (Request request : requests) {
-            if (request.getId() == id) {
-                return request;
-            }
-        }
-
-        return null;
+    public void confirmRequest(int requestId) {
+        requestDAO.confirmRequest(requestId);
     }
 
     public Request getRequestById(int id) {

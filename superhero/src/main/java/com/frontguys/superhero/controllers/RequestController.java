@@ -78,9 +78,7 @@ public class RequestController {
         String role = client.getRole();
 
         if (ClientRoles.ADMIN.equals(role)) {
-            Request request = requestService.getRequestById(id);
-            request.setConfirmed(true);
-            requestService.updateRequest(id, request);
+            requestService.confirmRequest(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>("You are not allowed to confirm requests", HttpStatus.FORBIDDEN);
@@ -131,15 +129,20 @@ public class RequestController {
         }
 
         List<Response> responses = responseService.getResponsesByRequestId(id);
-        for (Response response: responses) {
+        for (Response response : responses) {
             Client contractor = clientService.getClientById(response.getContractorId());
 
             ClientDetails contractorDetails = new ClientDetails();
             contractorDetails.setId(contractor.getId());
             contractorDetails.setEmail(contractor.getEmail());
-            contractorDetails.setName(contractor.getName());
-            contractorDetails.setInformation(contractor.getInformation());
             contractorDetails.setRole(contractor.getRole());
+            contractorDetails.setLegalEntity(contractor.isLegalEntity());
+            contractorDetails.setFirstName(contractor.getFirstName());
+            contractorDetails.setLastName(contractor.getLastName());
+            contractorDetails.setCompanyName(contractor.getCompanyName());
+            contractorDetails.setAddress(contractor.getAddress());
+            contractorDetails.setAbout(contractor.getAbout());
+
             response.setContractorDetails(contractorDetails);
         }
 
