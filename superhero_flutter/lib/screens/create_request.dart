@@ -16,7 +16,7 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
 
   hideKeyboard() async {
     FocusScope.of(context).requestFocus(new FocusNode());
-    Future.delayed(Duration(milliseconds: 350));
+    await Future.delayed(Duration(milliseconds: 350));
   }
 
   openDatePicker() async {

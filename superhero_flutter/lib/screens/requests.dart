@@ -24,8 +24,8 @@ class RequestsScreenState extends State<RequestsScreen> {
   Future<void> init() async {
     try {
       await ScopedModel.of<Store>(context).fetchRequests();
-    } catch (error) {
-      print(error);
+    } catch (e) {
+      print(e);
     }
   }
 

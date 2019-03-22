@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/components/button.dart';
+import 'package:superhero_flutter/components/input.dart';
+import 'package:superhero_flutter/constants/app_colors.dart';
 import 'package:superhero_flutter/constants/routes.dart';
 import 'package:superhero_flutter/store.dart';
 
@@ -22,8 +25,10 @@ class LoginScreenState extends State<LoginScreen> {
     passwordTextEditingController.text = 'admin';
   }
 
-  void onSubmit() async {
+  void onLogin() async {
     showLoader();
+
+    await Future.delayed(Duration(milliseconds: 500));
 
     String email = emailTextEditingController.text;
     String password = passwordTextEditingController.text;
@@ -60,36 +65,42 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.MAIN_COLOR,
       body: Center(
-        child: isLoading
-            ? CircularProgressIndicator()
-            : Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TextField(
-                          controller: emailTextEditingController,
-                          decoration:
-                              InputDecoration.collapsed(hintText: 'Email')),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TextField(
-                          controller: passwordTextEditingController,
-                          decoration:
-                              InputDecoration.collapsed(hintText: 'Пароль')),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: RaisedButton(
-                          onPressed: onSubmit,
-                          child: Text('Войти'),
-                        )),
-                  ],
+        child: Container(
+          margin: EdgeInsets.all(10),
+          child: Card(
+            elevation: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(bottom: 20),
+                    child: Image.asset('assets/logo.png')),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Input(controller: emailTextEditingController),
+                        margin: EdgeInsets.only(bottom: 10),
+                      ),
+                      Container(
+                        child: Input(controller: passwordTextEditingController),
+                        margin: EdgeInsets.only(bottom: 10),
+                      ),
+                      Button(
+                        text: 'Войти',
+                        onTap: onLogin,
+                        isLoading: isLoading,
+                      )
+                    ],
+                  ),
                 ),
-              ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
