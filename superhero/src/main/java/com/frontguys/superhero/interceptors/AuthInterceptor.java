@@ -2,6 +2,7 @@ package com.frontguys.superhero.interceptors;
 
 import com.frontguys.superhero.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -15,6 +16,10 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
+            return true;
+        }
+
         String uri = request.getRequestURI();
 
         if (uri.contains("auth")) {

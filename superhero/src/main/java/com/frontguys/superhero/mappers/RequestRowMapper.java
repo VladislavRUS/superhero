@@ -20,9 +20,12 @@ public class RequestRowMapper implements RowMapper {
         }
 
         request.setExpirationDate(resultSet.getDate("expiration_date"));
+        request.setPublishDate(resultSet.getDate("publish_date"));
         request.setDescription(resultSet.getString("description"));
         request.setConfirmed(resultSet.getBoolean("is_confirmed"));
         request.setResponseCount(resultSet.getInt("response_count"));
+        request.setTitle(resultSet.getString("title"));
+        request.setBudget(resultSet.getInt("budget"));
 
         return request;
     }

@@ -58,16 +58,7 @@ public class AuthController {
             HashMap<String, Object> result = new HashMap<>();
             Client clientByToken = clientService.getClientByToken(token);
 
-            ClientDetails clientDetails = new ClientDetails();
-            clientDetails.setId(clientByToken.getId());
-            clientDetails.setEmail(clientByToken.getEmail());
-            clientDetails.setRole(clientByToken.getRole());
-            clientDetails.setLegalEntity(clientByToken.isLegalEntity());
-            clientDetails.setFirstName(clientByToken.getFirstName());
-            clientDetails.setLastName(clientByToken.getLastName());
-            clientDetails.setCompanyName(clientByToken.getCompanyName());
-            clientDetails.setAddress(clientByToken.getAddress());
-            clientDetails.setAbout(clientByToken.getAbout());
+            ClientDetails clientDetails = new ClientDetails(clientByToken);
 
             result.put("clientDetails", clientDetails);
             result.put("token", token);

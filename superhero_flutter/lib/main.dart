@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:superhero_flutter/constants/routes.dart';
 import 'package:superhero_flutter/screens/app.dart';
+import 'package:superhero_flutter/screens/messages.dart';
 import 'package:superhero_flutter/screens/create_request.dart';
 import 'package:superhero_flutter/screens/detailed_request.dart';
 import 'package:superhero_flutter/screens/initial.dart';
@@ -28,7 +29,8 @@ class MainScreen extends StatelessWidget {
         Routes.LOGIN: (context) => LoginScreen(),
         Routes.APP: (context) => AppScreen(),
         Routes.CREATE_REQUEST: (context) => CreateRequestScreen(),
-        Routes.DETAILED_REQUEST: (context) => DetailedRequestScreen()
+        Routes.DETAILED_REQUEST: (context) => DetailedRequestScreen(),
+        Routes.MESSAGES: (context) => MessagesScreen()
       },
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

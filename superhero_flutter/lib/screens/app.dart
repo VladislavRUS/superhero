@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:superhero_flutter/constants/roles.dart';
 import 'package:superhero_flutter/screens/profile.dart';
 import 'package:superhero_flutter/screens/requests.dart';
 import 'package:superhero_flutter/screens/responses.dart';
 import 'package:superhero_flutter/screens/settings.dart';
-import 'package:superhero_flutter/store.dart';
 
 class AppScreen extends StatefulWidget {
   @override
@@ -52,23 +49,18 @@ class AppScreenState extends State<AppScreen> {
     );
   }
 
-  Widget getRow(String role) {
-    if (role == Roles.CUSTOMER || role == Roles.ADMIN) {
-      return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            bottomBarButton(Icons.search, 'Заявки', () => setScreenIndex(0),
-                isActiveScreen(0)),
-            bottomBarButton(Icons.email, 'Отклики', () => setScreenIndex(1),
-                isActiveScreen(1)),
-            bottomBarButton(Icons.person, 'Профиль', () => setScreenIndex(2),
-                isActiveScreen(2)),
-            bottomBarButton(Icons.settings, 'Настройки',
-                () => setScreenIndex(3), isActiveScreen(3)),
-          ]);
-    }
-
-    return null;
+  Widget getRow() {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
+        Widget>[
+      bottomBarButton(
+          Icons.search, 'Заявки', () => setScreenIndex(0), isActiveScreen(0)),
+      bottomBarButton(
+          Icons.email, 'Отклики', () => setScreenIndex(1), isActiveScreen(1)),
+      bottomBarButton(
+          Icons.person, 'Профиль', () => setScreenIndex(2), isActiveScreen(2)),
+      bottomBarButton(Icons.settings, 'Настройки', () => setScreenIndex(3),
+          isActiveScreen(3)),
+    ]);
   }
 
   setScreenIndex(int idx) {
@@ -83,15 +75,12 @@ class AppScreenState extends State<AppScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Store store = ScopedModel.of(context);
-    String role = store.role;
-
     return Scaffold(
       body: screens[screenIndex],
       bottomNavigationBar: BottomAppBar(
         child: Container(
           height: 60,
-          child: getRow(role),
+          child: getRow(),
         ),
       ),
     );

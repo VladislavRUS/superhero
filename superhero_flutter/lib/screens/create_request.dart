@@ -10,6 +10,8 @@ class CreateRequestScreen extends StatefulWidget {
 
 class CreateRequestScreenState extends State<CreateRequestScreen> {
   TextEditingController dateFieldController = new TextEditingController();
+  TextEditingController titleFieldController = new TextEditingController();
+  TextEditingController budgetFieldController = new TextEditingController();
   TextEditingController descriptionFieldController =
       new TextEditingController();
   bool isSaving = false;
@@ -41,7 +43,9 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
 
   onSave() {
     if (descriptionFieldController.text == '' ||
-        dateFieldController.text == '') {
+        dateFieldController.text == '' ||
+        titleFieldController.text == '' ||
+        budgetFieldController.text == '') {
       showDialog(
           context: context,
           builder: (context) {
@@ -59,11 +63,13 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
 
     showLoader();
 
+    String title = titleFieldController.text;
+    String budget = budgetFieldController.text;
     String description = descriptionFieldController.text;
     String expirationDate = dateFieldController.text;
 
     try {
-      await store.createRequest(description, expirationDate);
+      await store.createRequest(title, budget, description, expirationDate);
     } catch (e) {} finally {
       hideLoader();
     }
@@ -87,6 +93,8 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
   void dispose() {
     descriptionFieldController.dispose();
     dateFieldController.dispose();
+    titleFieldController.dispose();
+    budgetFieldController.dispose();
     super.dispose();
   }
 
@@ -96,40 +104,63 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
       appBar: AppBar(
         title: Text('Создайте заявку'),
       ),
-      body: isSaving ? Container(child: Center(child: CircularProgressIndicator())) : Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: descriptionFieldController,
-                    decoration: InputDecoration(labelText: 'Описание'),
+      body: isSaving
+          ? Container(child: Center(child: CircularProgressIndicator()))
+          : Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          controller: descriptionFieldController,
+                          decoration: InputDecoration(labelText: 'Описание'),
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: GestureDetector(
-                    onTap: openDatePicker,
-                    child: AbsorbPointer(
-                      child: TextField(
-                        enabled: false,
-                        decoration: InputDecoration(hintText: 'Выберите дату'),
-                        controller: dateFieldController,
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          controller: titleFieldController,
+                          decoration: InputDecoration(labelText: 'Название'),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          controller: budgetFieldController,
+                          decoration: InputDecoration(labelText: 'Бюджет'),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: openDatePicker,
+                          child: AbsorbPointer(
+                            child: TextField(
+                              enabled: false,
+                              decoration:
+                                  InputDecoration(hintText: 'Выберите дату'),
+                              controller: dateFieldController,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
           onPressed: onSave, child: Center(child: Icon(Icons.check))),
     );

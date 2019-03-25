@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @CrossOrigin(value = "*")
 @RestController
@@ -72,6 +73,24 @@ public class ResponseController {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
             }
+        }
+    }
+
+    @RequestMapping(value = "/api/v1/auth/responses", method = RequestMethod.GET)
+    public ResponseEntity<Object> getResponses(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        if (ClientRoles.CUSTOMER.equals(role)) {
+            List<Response> responsesByCustomerId = responseService.getResponsesByCustomerId(client.getId());
+            return new ResponseEntity<>(responsesByCustomerId, HttpStatus.OK);
+        } else if (ClientRoles.CONTRACTOR.equals(role)) {
+            List<Response> responsesByContractorId = responseService.getResponsesByContractorId(client.getId());
+            return new ResponseEntity<>(responsesByContractorId, HttpStatus.OK);
+        } else {
+            List<Response> allResponses = responseService.getAllResponses();
+            return new ResponseEntity<>(allResponses, HttpStatus.OK);
         }
     }
 }

@@ -20,9 +20,9 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    emailTextEditingController.text = 'contractor';
+    passwordTextEditingController.text = 'contractor';
     super.initState();
-    emailTextEditingController.text = 'admin';
-    passwordTextEditingController.text = 'admin';
   }
 
   void onLogin() async {

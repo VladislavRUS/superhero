@@ -13,6 +13,21 @@ public class ClientDetails {
     private String about;
     private boolean isLegalEntity;
 
+    public ClientDetails() {
+    }
+
+    public ClientDetails(Client client) {
+        this.id = client.getId();
+        this.email = client.getEmail();
+        this.role = client.getRole();
+        this.firstName = client.getFirstName();
+        this.lastName = client.getLastName();
+        this.companyName = client.getCompanyName();
+        this.address = client.getAddress();
+        this.about = client.getAbout();
+        this.isLegalEntity = client.isLegalEntity();
+    }
+
     public int getId() {
         return id;
     }
@@ -77,7 +92,7 @@ public class ClientDetails {
         this.about = about;
     }
 
-    @JsonProperty(value="isLegalEntity")
+    @JsonProperty(value = "isLegalEntity")
     public boolean isLegalEntity() {
         return isLegalEntity;
     }

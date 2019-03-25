@@ -8,9 +8,12 @@ public class Request {
     private int id;
     private int customerId;
     private Integer contractorId;
+    private String title;
+    private Integer budget;
     private String description;
     private boolean isConfirmed;
     private Date expirationDate;
+    private Date publishDate;
     private int responseCount;
 
     public int getId() {
@@ -19,6 +22,22 @@ public class Request {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Integer budget) {
+        this.budget = budget;
     }
 
     public int getCustomerId() {
@@ -68,5 +87,13 @@ public class Request {
 
     public void setResponseCount(int responseCount) {
         this.responseCount = responseCount;
+    }
+
+    public Date getPublishDate() {
+        return publishDate;
+    }
+
+    public void setPublishDate(Date publishDate) {
+        this.publishDate = publishDate;
     }
 }

@@ -17,8 +17,8 @@ class RequestsScreenState extends State<RequestsScreen> {
 
   @override
   void initState() {
-    super.initState();
     init();
+    super.initState();
   }
 
   Future<void> init() async {
@@ -31,14 +31,14 @@ class RequestsScreenState extends State<RequestsScreen> {
 
   Widget buildList() {
     var requests =
-        ScopedModel.of<Store>(context, rebuildOnChange: true).requests;
+        ScopedModel.of<Store>(context).requests;
 
     return ListView.builder(
         itemCount: requests != null ? requests.length : 0,
         itemBuilder: (context, index) {
           var request = requests[index];
+          var title = request.title;
           var description = request.description;
-          var expirationDate = request.expirationDate;
           var responseCount = request.responseCount;
           var isConfirmed = request.isConfirmed;
 
@@ -47,9 +47,9 @@ class RequestsScreenState extends State<RequestsScreen> {
                 Icons.description,
                 color: isConfirmed ? Colors.green : Colors.grey,
               ),
-              title: Text(description),
+              title: Text(title),
               trailing: Text(responseCount.toString()),
-              subtitle: Text(expirationDate.toString()),
+              subtitle: Text(description),
               onTap: () {
                 onListTileTap(requests[index]);
               });
@@ -67,8 +67,10 @@ class RequestsScreenState extends State<RequestsScreen> {
     init();
   }
 
-  canSeeActionButton(String role) {
-    if (role == Roles.CUSTOMER) {
+  canSeeActionButton() {
+    Store store = ScopedModel.of<Store>(context);
+
+    if (store.clientDetails.role == Roles.CUSTOMER) {
       return true;
     }
 
@@ -77,9 +79,7 @@ class RequestsScreenState extends State<RequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Store store = ScopedModel.of(context);
-    String role = store.role;
-    bool isActionButtonAvailable = canSeeActionButton(role);
+    ScopedModel.of<Store>(context, rebuildOnChange: true);
 
     return Scaffold(
       appBar: AppBar(
@@ -89,7 +89,7 @@ class RequestsScreenState extends State<RequestsScreen> {
       })),
       body: RefreshIndicator(
           key: _refreshIndicatorKey, child: buildList(), onRefresh: init),
-      floatingActionButton: isActionButtonAvailable
+      floatingActionButton: canSeeActionButton()
           ? FloatingActionButton(
               onPressed: addRequest,
               child: Center(

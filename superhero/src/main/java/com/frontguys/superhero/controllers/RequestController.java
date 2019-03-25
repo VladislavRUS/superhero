@@ -4,7 +4,6 @@ import com.frontguys.superhero.constants.ClientRoles;
 import com.frontguys.superhero.models.Client;
 import com.frontguys.superhero.models.Request;
 import com.frontguys.superhero.models.Response;
-import com.frontguys.superhero.models.ClientDetails;
 import com.frontguys.superhero.services.ClientService;
 import com.frontguys.superhero.services.RequestService;
 import com.frontguys.superhero.services.ResponseService;
@@ -115,10 +114,6 @@ public class RequestController {
         Client client = clientService.getClientByToken(token);
         String role = client.getRole();
 
-        if (ClientRoles.CONTRACTOR.equals(role)) {
-            return new ResponseEntity<>("Contractors cannot update requests", HttpStatus.FORBIDDEN);
-        }
-
         Request request = requestService.getRequestById(id);
 
         // Customer can see only his responses
@@ -129,23 +124,6 @@ public class RequestController {
         }
 
         List<Response> responses = responseService.getResponsesByRequestId(id);
-        for (Response response : responses) {
-            Client contractor = clientService.getClientById(response.getContractorId());
-
-            ClientDetails contractorDetails = new ClientDetails();
-            contractorDetails.setId(contractor.getId());
-            contractorDetails.setEmail(contractor.getEmail());
-            contractorDetails.setRole(contractor.getRole());
-            contractorDetails.setLegalEntity(contractor.isLegalEntity());
-            contractorDetails.setFirstName(contractor.getFirstName());
-            contractorDetails.setLastName(contractor.getLastName());
-            contractorDetails.setCompanyName(contractor.getCompanyName());
-            contractorDetails.setAddress(contractor.getAddress());
-            contractorDetails.setAbout(contractor.getAbout());
-
-            response.setContractorDetails(contractorDetails);
-        }
-
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 }

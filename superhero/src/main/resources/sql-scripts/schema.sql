@@ -45,4 +45,3 @@ create table response (
   contractor_id integer references client (id),
   date          date
 );
-

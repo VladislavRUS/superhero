@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -34,13 +35,16 @@ public class RequestDAO {
     }
 
     public void createRequest(Request request) {
-        String query = "insert into request (customer_id, contractor_id, description, expiration_date, is_confirmed) values (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, request.getCustomerId(), null, request.getDescription(), request.getExpirationDate(), false);
+        String query = "insert into request (customer_id, contractor_id, title, description, budget, expiration_date, publish_date, is_confirmed) values (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        Date publishDate = new Date();
+
+        jdbcTemplate.update(query, request.getCustomerId(), null, request.getTitle(), request.getDescription(), request.getBudget(), request.getExpirationDate(), publishDate, false);
     }
 
     public void updateRequest(int requestId, Request request) {
-        String query = "update request set contractor_id = ?, description = ?, expiration_date = ? where id = ?";
-        jdbcTemplate.update(query, request.getContractorId(), request.getDescription(), request.getExpirationDate(), requestId);
+        String query = "update request set contractor_id = ?, description = ?, expiration_date = ?, budget = ?, response_count = ? where id = ?";
+        jdbcTemplate.update(query, request.getContractorId(), request.getDescription(), request.getExpirationDate(), request.getBudget(), request.getResponseCount(), requestId);
     }
 
     public void confirmRequest(int requestId) {

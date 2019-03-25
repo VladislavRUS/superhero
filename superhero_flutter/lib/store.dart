@@ -1,50 +1,56 @@
-import 'dart:convert';
-
-import 'package:scoped_model/scoped_model.dart';
+import 'package:intl/intl.dart';
 import 'package:requests/requests.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/models/client_details.dart';
+import 'package:superhero_flutter/models/message.dart';
 import 'package:superhero_flutter/models/request.dart';
+import 'package:superhero_flutter/models/response.dart';
 
 String baseUrl = 'http://10.0.2.2:8080';
-//String baseUrl = 'http://ed4324ae.ngrok.io';
+//String baseUrl = 'http://b975cbb4.ngrok.io';
 
 class Store extends Model {
   String token;
-  String role;
-  List<Request> requests;
+  ClientDetails clientDetails;
   Request detailedRequest;
+  Response currentResponse;
+  List<Request> requests;
+  List<Response> responses;
+  List<Message> messages;
 
   login(String email, String password) async {
     var response = await Requests.post(baseUrl + '/api/v1/login',
         body: {'email': email, 'password': password}, json: true);
     token = response['token'];
-
-    var clientDetails = response['clientDetails'];
-    role = clientDetails['role'];
+    clientDetails = ClientDetails.fromJson(response['clientDetails']);
   }
 
   fetchRequests() async {
-    var response = await Requests.get(baseUrl + '/api/v1/auth/requests',
-        headers: {'Authorization': token});
-    var jsonResponses = json.decode(response);
+    var jsonRequests = await Requests.get(baseUrl + '/api/v1/auth/requests',
+        headers: {'Authorization': token}, json: true);
 
     requests = List<Request>();
 
-    jsonResponses.forEach((json) {
-      requests.add(Request.fromJson(json));
+    jsonRequests.forEach((jsonRequest) {
+      requests.add(Request.fromJson(jsonRequest));
     });
 
     notifyListeners();
   }
 
-  createRequest(String description, String expirationDate) async {
-    var body = {'description': description, 'expirationDate': expirationDate};
+  createRequest(String title, String budget, String description, String expirationDate) async {
+    var body = {'title': title, 'budget': budget, 'description': description, 'expirationDate': expirationDate};
 
     await Requests.post(baseUrl + '/api/v1/auth/requests',
-        headers: {'Authorization': token}, body: body, json: true);
+        headers: {'Authorization': token}, body: body);
   }
 
   setDetailedRequest(Request request) {
     detailedRequest = request;
+  }
+
+  setCurrentResponse(Response response) {
+    currentResponse = response;
   }
 
   confirmRequest(int requestId) async {
@@ -53,5 +59,58 @@ class Store extends Model {
         headers: {'Authorization': token});
 
     notifyListeners();
+  }
+
+  respond(int requestId) async {
+    String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    var body = {'requestId': requestId, 'date': date};
+
+    await Requests.post(baseUrl + '/api/v1/auth/responses',
+        headers: {'Authorization': token}, body: body);
+
+    notifyListeners();
+  }
+
+  fetchResponses() async {
+    String url = baseUrl + '/api/v1/auth/responses';
+
+    var jsonResponses =
+        await Requests.get(url, headers: {'Authorization': token}, json: true);
+
+    responses = List<Response>();
+
+    jsonResponses.forEach((jsonResponse) {
+      responses.add(Response.fromJson(jsonResponse));
+    });
+
+    notifyListeners();
+  }
+
+  fetchMessages(int responseId) async {
+    String url = baseUrl +
+        '/api/v1/auth/responses/' +
+        responseId.toString() +
+        '/messages';
+
+    var jsonMessages =
+        await Requests.get(url, headers: {'Authorization': token}, json: true);
+
+    messages = List<Message>();
+
+    jsonMessages.forEach((jsonMessage) {
+      messages.add(Message.fromJson(jsonMessage));
+    });
+
+    notifyListeners();
+  }
+
+  sendMessage(int responseId, String text) async {
+    String url = baseUrl +
+        '/api/v1/auth/responses/' +
+        responseId.toString() +
+        '/messages';
+    var body = {"text": text};
+    await Requests.post(url, headers: {'Authorization': token}, body: body);
   }
 }

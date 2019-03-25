@@ -8,6 +8,8 @@ public class Response {
     private int contractorId;
     private Date date;
     private ClientDetails contractorDetails;
+    private ClientDetails customerDetails;
+    private Request request;
 
     public int getId() {
         return id;
@@ -47,5 +49,21 @@ public class Response {
 
     public void setContractorDetails(ClientDetails contractorDetails) {
         this.contractorDetails = contractorDetails;
+    }
+
+    public ClientDetails getCustomerDetails() {
+        return customerDetails;
+    }
+
+    public void setCustomerDetails(ClientDetails customerDetails) {
+        this.customerDetails = customerDetails;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public void setRequest(Request request) {
+        this.request = request;
     }
 }
