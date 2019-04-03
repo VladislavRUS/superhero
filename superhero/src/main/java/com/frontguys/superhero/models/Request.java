@@ -9,6 +9,7 @@ public class Request {
     private int customerId;
     private Integer contractorId;
     private String title;
+    private boolean isFinished;
     private Integer budget;
     private String description;
     private boolean isConfirmed;
@@ -95,5 +96,14 @@ public class Request {
 
     public void setPublishDate(Date publishDate) {
         this.publishDate = publishDate;
+    }
+
+    @JsonProperty(value="isFinished")
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
     }
 }

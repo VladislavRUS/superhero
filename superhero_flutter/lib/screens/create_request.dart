@@ -9,12 +9,13 @@ class CreateRequestScreen extends StatefulWidget {
 }
 
 class CreateRequestScreenState extends State<CreateRequestScreen> {
-  TextEditingController dateFieldController = new TextEditingController();
+  TextEditingController expirationDateFieldController =
+      new TextEditingController();
   TextEditingController titleFieldController = new TextEditingController();
-  TextEditingController budgetFieldController = new TextEditingController();
   TextEditingController descriptionFieldController =
       new TextEditingController();
   bool isSaving = false;
+  double budget = 1;
 
   hideKeyboard() async {
     FocusScope.of(context).requestFocus(new FocusNode());
@@ -37,15 +38,15 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
         lastDate: lastDate);
 
     if (date != null) {
-      dateFieldController.text = DateFormat('yyyy-MM-dd').format(date);
+      expirationDateFieldController.text =
+          DateFormat('yyyy-MM-dd').format(date);
     }
   }
 
   onSave() {
     if (descriptionFieldController.text == '' ||
-        dateFieldController.text == '' ||
-        titleFieldController.text == '' ||
-        budgetFieldController.text == '') {
+        expirationDateFieldController.text == '' ||
+        titleFieldController.text == '') {
       showDialog(
           context: context,
           builder: (context) {
@@ -64,12 +65,12 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
     showLoader();
 
     String title = titleFieldController.text;
-    String budget = budgetFieldController.text;
+    String budgetStr = budget.toInt().toString();
     String description = descriptionFieldController.text;
-    String expirationDate = dateFieldController.text;
+    String expirationDate = expirationDateFieldController.text;
 
     try {
-      await store.createRequest(title, budget, description, expirationDate);
+      await store.createRequest(title, budgetStr, description, expirationDate);
     } catch (e) {} finally {
       hideLoader();
     }
@@ -92,9 +93,8 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
   @override
   void dispose() {
     descriptionFieldController.dispose();
-    dateFieldController.dispose();
+    expirationDateFieldController.dispose();
     titleFieldController.dispose();
-    budgetFieldController.dispose();
     super.dispose();
   }
 
@@ -114,16 +114,6 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
                     children: <Widget>[
                       Expanded(
                         child: TextField(
-                          controller: descriptionFieldController,
-                          decoration: InputDecoration(labelText: 'Описание'),
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
                           controller: titleFieldController,
                           decoration: InputDecoration(labelText: 'Название'),
                         ),
@@ -134,9 +124,31 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
                     children: <Widget>[
                       Expanded(
                         child: TextField(
-                          controller: budgetFieldController,
-                          decoration: InputDecoration(labelText: 'Бюджет'),
+                          controller: descriptionFieldController,
+                          decoration: InputDecoration(labelText: 'Описание'),
                         ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text('Бюджет, ${budget.toInt().toString()} тыс.'),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Slider(value: budget, min: 1, max: 1000, onChanged: (newValue) {
+                              setState(() {
+                                budget = newValue;
+                              });
+                            }),
+                          )
+                        ],
                       )
                     ],
                   ),
@@ -151,7 +163,7 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
                               enabled: false,
                               decoration:
                                   InputDecoration(hintText: 'Выберите дату'),
-                              controller: dateFieldController,
+                              controller: expirationDateFieldController,
                             ),
                           ),
                         ),

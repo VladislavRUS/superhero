@@ -126,4 +126,59 @@ public class RequestController {
         List<Response> responses = responseService.getResponsesByRequestId(id);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/api/v1/auth/requests/{requestId}/assign", method = RequestMethod.POST)
+    public ResponseEntity<Object> assignRequest(HttpServletRequest httpServletRequest, @PathVariable int requestId, @RequestParam int contractorId) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        Request request = requestService.getRequestById(requestId);
+
+        // Customer can see only his responses
+        if (ClientRoles.CUSTOMER.equals(role)) {
+            if (request.getCustomerId() != client.getId()) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        List<Response> responsesByContractorId = responseService.getResponsesByContractorId(contractorId);
+
+        if (!responseService.hasResponseWithContractorId(responsesByContractorId, contractorId)) {
+            return new ResponseEntity<>("No response from that contractor", HttpStatus.FORBIDDEN);
+        }
+
+        request.setContractorId(contractorId);
+        requestService.updateRequest(requestId, request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/api/v1/auth/requests/{requestId}/finish", method = RequestMethod.POST)
+    public ResponseEntity<Object> finish(HttpServletRequest httpServletRequest, @PathVariable int requestId) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        Request request = requestService.getRequestById(requestId);
+
+        // Customer can see only his responses
+        if (ClientRoles.CUSTOMER.equals(role)) {
+            if (request.getCustomerId() != client.getId()) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        if (request.isFinished()) {
+            return new ResponseEntity<>("Already finished", HttpStatus.BAD_REQUEST);
+        }
+
+        if (request.getContractorId() == null) {
+            return new ResponseEntity<>("No contractor", HttpStatus.BAD_REQUEST);
+        }
+
+        requestService.finishRequest(requestId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

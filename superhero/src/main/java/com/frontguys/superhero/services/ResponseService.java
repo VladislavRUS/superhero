@@ -78,4 +78,30 @@ public class ResponseService {
         request.setResponseCount(request.getResponseCount() - 1);
         requestDAO.updateRequest(request.getId(), request);
     }
+
+    public boolean hasResponseWithContractorId(List<Response> responses, int contractorId) {
+        boolean hasResponse = false;
+
+        for (Response response : responses) {
+            if (response.getContractorId() == contractorId) {
+                hasResponse = true;
+                break;
+            }
+        }
+
+        return hasResponse;
+    }
+
+    public boolean customerAndContractorWorkedTogether(List<Response> responses, int customerId, int contractorId) {
+        boolean workedTogether = false;
+
+        for (Response response : responses) {
+            if (response.getContractorId() == contractorId && response.getCustomerDetails().getId() == customerId) {
+                workedTogether = true;
+                break;
+            }
+        }
+
+        return workedTogether;
+    }
 }

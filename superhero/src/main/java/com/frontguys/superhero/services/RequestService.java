@@ -35,4 +35,8 @@ public class RequestService {
     public Request getRequestById(int id) {
         return requestDAO.getRequestById(id);
     }
+
+    public void finishRequest(int requestId) {
+        requestDAO.finishRequest(requestId);
+    }
 }

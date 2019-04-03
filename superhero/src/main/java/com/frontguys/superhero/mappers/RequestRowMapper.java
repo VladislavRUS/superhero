@@ -26,6 +26,7 @@ public class RequestRowMapper implements RowMapper {
         request.setResponseCount(resultSet.getInt("response_count"));
         request.setTitle(resultSet.getString("title"));
         request.setBudget(resultSet.getInt("budget"));
+        request.setFinished(resultSet.getBoolean("is_finished"));
 
         return request;
     }

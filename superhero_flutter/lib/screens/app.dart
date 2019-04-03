@@ -55,8 +55,6 @@ class AppScreenState extends State<AppScreen> {
       bottomBarButton(
           Icons.search, 'Заявки', () => setScreenIndex(0), isActiveScreen(0)),
       bottomBarButton(
-          Icons.email, 'Отклики', () => setScreenIndex(1), isActiveScreen(1)),
-      bottomBarButton(
           Icons.person, 'Профиль', () => setScreenIndex(2), isActiveScreen(2)),
       bottomBarButton(Icons.settings, 'Настройки', () => setScreenIndex(3),
           isActiveScreen(3)),

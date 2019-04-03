@@ -8,6 +8,7 @@ class Request {
   String expirationDate;
   String publishDate;
   bool isConfirmed;
+  bool isFinished;
   int responseCount;
 
   Request.fromJson(map) {
@@ -20,6 +21,7 @@ class Request {
     expirationDate = map['expirationDate'];
     publishDate = map['publishDate'];
     isConfirmed = map['isConfirmed'];
+    isFinished = map['isFinished'];
     responseCount = map['responseCount'];
   }
 }

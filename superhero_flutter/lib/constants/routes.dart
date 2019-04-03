@@ -5,4 +5,5 @@ class Routes {
   static const String CREATE_REQUEST = '/createRequest';
   static const String DETAILED_REQUEST = '/detailedRequest';
   static const String MESSAGES = '/messages';
+  static const String RESPONSES = '/responses';
 }

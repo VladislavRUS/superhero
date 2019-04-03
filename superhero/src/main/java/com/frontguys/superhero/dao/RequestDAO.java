@@ -35,11 +35,11 @@ public class RequestDAO {
     }
 
     public void createRequest(Request request) {
-        String query = "insert into request (customer_id, contractor_id, title, description, budget, expiration_date, publish_date, is_confirmed) values (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "insert into request (customer_id, contractor_id, title, description, budget, expiration_date, publish_date, is_confirmed, is_finished) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         Date publishDate = new Date();
 
-        jdbcTemplate.update(query, request.getCustomerId(), null, request.getTitle(), request.getDescription(), request.getBudget(), request.getExpirationDate(), publishDate, false);
+        jdbcTemplate.update(query, request.getCustomerId(), null, request.getTitle(), request.getDescription(), request.getBudget(), request.getExpirationDate(), publishDate, false, false);
     }
 
     public void updateRequest(int requestId, Request request) {
@@ -49,6 +49,11 @@ public class RequestDAO {
 
     public void confirmRequest(int requestId) {
         String query = "update request set is_confirmed = true where id = ?";
+        jdbcTemplate.update(query, requestId);
+    }
+
+    public void finishRequest(int requestId) {
+        String query = "update request set is_finished = true where id = ?";
         jdbcTemplate.update(query, requestId);
     }
 }

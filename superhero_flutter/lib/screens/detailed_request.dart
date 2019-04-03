@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/components/button.dart';
 import 'package:superhero_flutter/constants/actions.dart';
 import 'package:superhero_flutter/constants/roles.dart';
+import 'package:superhero_flutter/constants/routes.dart';
+import 'package:superhero_flutter/models/choice.dart';
 import 'package:superhero_flutter/models/request.dart';
 import 'package:superhero_flutter/models/response.dart';
 import 'package:superhero_flutter/store.dart';
@@ -9,14 +12,6 @@ import 'package:superhero_flutter/store.dart';
 class DetailedRequestScreen extends StatefulWidget {
   @override
   DetailedRequestState createState() => DetailedRequestState();
-}
-
-class Choice {
-  String title;
-  String action;
-  bool enabled;
-
-  Choice({this.title, this.action, this.enabled});
 }
 
 class DetailedRequestState extends State<DetailedRequestScreen> {
@@ -92,6 +87,12 @@ class DetailedRequestState extends State<DetailedRequestScreen> {
     );
   }
 
+  Widget toResponsesButton() {
+    return Button(text: 'Отклики', isLoading: false, onTap: () {
+      Navigator.of(context).pushNamed(Routes.RESPONSES);
+    });
+  }
+
   @override
   void initState() {
     init();
@@ -159,6 +160,7 @@ class DetailedRequestState extends State<DetailedRequestScreen> {
                     field('Описание', request.description),
                     field('Дата', request.expirationDate),
                     field('Подтверждено', request.isConfirmed.toString()),
+                    toResponsesButton()
                   ])),
     );
   }

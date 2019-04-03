@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/constants/actions.dart';
+import 'package:superhero_flutter/constants/roles.dart';
+import 'package:superhero_flutter/models/choice.dart';
 import 'package:superhero_flutter/models/message.dart';
 import 'package:superhero_flutter/store.dart';
 
@@ -27,9 +30,11 @@ class MessagesScreenState extends State<MessagesScreen> {
   init() async {
     showLoader();
     await fetchMessages();
+    await fetchFeedbacks();
     hideLoader();
 
-    updateTimer = new Timer(Duration(seconds: 1), fetchMessages);
+    updateTimer =
+        new Timer.periodic(Duration(seconds: 1), (timer) => fetchMessages());
   }
 
   fetchMessages() async {
@@ -37,11 +42,16 @@ class MessagesScreenState extends State<MessagesScreen> {
 
     try {
       await store.fetchMessages(store.currentResponse.id);
-      if (scrollController.position != null) {
-        scrollController.animateTo(scrollController.position.maxScrollExtent,
-            duration: Duration(milliseconds: 150), curve: Curves.ease);
-      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
+  fetchFeedbacks() async {
+    Store store = ScopedModel.of<Store>(context);
+
+    try {
+      await store.fetchFeedbacks(store.currentResponse.contractorId);
     } catch (e) {
       print(e);
     }
@@ -84,7 +94,6 @@ class MessagesScreenState extends State<MessagesScreen> {
     Store store = ScopedModel.of<Store>(context);
     return Container(
       padding: EdgeInsets.only(left: 20, right: 20, top: 20),
-
       child: ListView.builder(
           controller: scrollController,
           itemCount: store.messages.length,
@@ -129,11 +138,105 @@ class MessagesScreenState extends State<MessagesScreen> {
     super.dispose();
   }
 
+  List<Choice> getMenuItems() {
+    List<Choice> choices = List();
+
+    Store store = ScopedModel.of<Store>(context);
+
+    if (store.clientDetails.role == Roles.CUSTOMER) {
+      choices.add(Choice(
+          title: 'Назначить исполняющим',
+          action: Actions.ASSIGN,
+          enabled: store.detailedRequest.contractorId == null));
+
+      choices.add(Choice(
+          title: 'Завершить заявку',
+          action: Actions.FINISH,
+          enabled: !store.detailedRequest.isFinished));
+
+      choices.add(Choice(
+          title: 'Оставить отзыв',
+          action: Actions.CREATE_FEEDBACK,
+          enabled: store.detailedRequest.isFinished && !alreadyLeftFeedback()));
+    }
+
+    return choices;
+  }
+
+  bool alreadyLeftFeedback() {
+    bool leftFeedback = false;
+    Store store = ScopedModel.of<Store>(context);
+
+    if (store.feedbacks != null) {
+      for (int i = 0; i < store.feedbacks.length; i++) {
+        if (store.feedbacks[i].customerId == store.clientDetails.id) {
+          leftFeedback = true;
+          break;
+        }
+      }
+    }
+
+    return leftFeedback;
+  }
+
+  onAction(Choice choice) {
+    if (choice.action == Actions.ASSIGN) {
+      assign();
+    } else if (choice.action == Actions.FINISH) {
+      finish();
+    }
+  }
+
+  assign() async {
+    showLoader();
+    Store store = ScopedModel.of<Store>(context);
+
+    try {
+      int requestId = store.detailedRequest.id;
+      int contractorId = store.currentResponse.contractorDetails.id;
+      await store.assign(requestId, contractorId);
+    } catch (e) {
+      print(e);
+    } finally {
+      hideLoader();
+    }
+  }
+
+  finish() async {
+    showLoader();
+    Store store = ScopedModel.of<Store>(context);
+
+    try {
+      int requestId = store.detailedRequest.id;
+      await store.finish(requestId);
+    } catch (e) {
+      print(e);
+    } finally {
+      hideLoader();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ScopedModel.of<Store>(context, rebuildOnChange: true);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Чат'),
+        actions: <Widget>[
+          PopupMenuButton<Choice>(
+            onSelected: onAction,
+            itemBuilder: (BuildContext context) {
+              return getMenuItems().map((Choice choice) {
+                return PopupMenuItem<Choice>(
+                  enabled: choice.enabled,
+                  value: choice,
+                  child: Text(choice.title),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
