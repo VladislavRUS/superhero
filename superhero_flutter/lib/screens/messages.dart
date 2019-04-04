@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:superhero_flutter/constants/actions.dart';
 import 'package:superhero_flutter/constants/roles.dart';
+import 'package:superhero_flutter/constants/routes.dart';
 import 'package:superhero_flutter/models/choice.dart';
 import 'package:superhero_flutter/models/message.dart';
 import 'package:superhero_flutter/store.dart';
@@ -34,7 +35,7 @@ class MessagesScreenState extends State<MessagesScreen> {
     hideLoader();
 
     updateTimer =
-        new Timer.periodic(Duration(seconds: 1), (timer) => fetchMessages());
+    new Timer.periodic(Duration(seconds: 1), (timer) => fetchMessages());
   }
 
   fetchMessages() async {
@@ -209,11 +210,38 @@ class MessagesScreenState extends State<MessagesScreen> {
     try {
       int requestId = store.detailedRequest.id;
       await store.finish(requestId);
+      _showDialog();
     } catch (e) {
       print(e);
     } finally {
       hideLoader();
     }
+  }
+
+  _showDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Хотите оставить отзыв?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Да'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushNamed(context, Routes.CREATE_FEEDBACK);
+                },
+              ),
+              FlatButton(
+                child: Text('Нет'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        }
+    );
   }
 
   @override
@@ -241,12 +269,12 @@ class MessagesScreenState extends State<MessagesScreen> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(child: Container(child: buildMessagesList())),
-                buildForm()
-              ],
-            ),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(child: Container(child: buildMessagesList())),
+          buildForm()
+        ],
+      ),
     );
   }
 }

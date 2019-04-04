@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/components/app_bar_text.dart';
+import 'package:superhero_flutter/components/input.dart';
+import 'package:superhero_flutter/constants/app_colors.dart';
 import 'package:superhero_flutter/store.dart';
 import 'package:intl/intl.dart';
 
@@ -12,10 +15,10 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
   TextEditingController expirationDateFieldController =
       new TextEditingController();
   TextEditingController titleFieldController = new TextEditingController();
+  TextEditingController budgetFieldController = new TextEditingController();
   TextEditingController descriptionFieldController =
       new TextEditingController();
   bool isSaving = false;
-  double budget = 1;
 
   hideKeyboard() async {
     FocusScope.of(context).requestFocus(new FocusNode());
@@ -65,7 +68,7 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
     showLoader();
 
     String title = titleFieldController.text;
-    String budgetStr = budget.toInt().toString();
+    String budgetStr = budgetFieldController.text;
     String description = descriptionFieldController.text;
     String expirationDate = expirationDateFieldController.text;
 
@@ -95,6 +98,7 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
     descriptionFieldController.dispose();
     expirationDateFieldController.dispose();
     titleFieldController.dispose();
+    budgetFieldController.dispose();
     super.dispose();
   }
 
@@ -102,55 +106,53 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Создайте заявку'),
-      ),
+          actions: <Widget>[
+            IconButton(
+              onPressed: onSave,
+              icon: Icon(
+                Icons.check,
+                color: AppColors.HEADER_TEXT_COLOR,
+              ),
+            )
+          ],
+          leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: AppColors.HEADER_TEXT_COLOR,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              }),
+          title: AppBarText(
+            text: 'Создание заявки',
+          ),
+          elevation: 0,
+          backgroundColor: Colors.white),
       body: isSaving
           ? Container(child: Center(child: CircularProgressIndicator()))
           : Container(
+              color: Colors.white,
               padding: EdgeInsets.all(20),
               child: Column(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
+                  Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: Input(
                           controller: titleFieldController,
-                          decoration: InputDecoration(labelText: 'Название'),
-                        ),
-                      )
-                    ],
+                          hintText: 'Название')),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 10),
+                    child: Input(
+                        maxLines: 5,
+                        controller: descriptionFieldController,
+                        hintText: 'Описание'),
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          controller: descriptionFieldController,
-                          decoration: InputDecoration(labelText: 'Описание'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text('Бюджет, ${budget.toInt().toString()} тыс.'),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Slider(value: budget, min: 1, max: 1000, onChanged: (newValue) {
-                              setState(() {
-                                budget = newValue;
-                              });
-                            }),
-                          )
-                        ],
-                      )
-                    ],
+                  Container(
+                    margin: EdgeInsets.only(bottom: 10),
+                    child: Input(
+                        controller: budgetFieldController,
+                        hintText: 'Бюджет, тыс.',
+                        inputType: TextInputType.numberWithOptions()),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -159,11 +161,22 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
                         child: GestureDetector(
                           onTap: openDatePicker,
                           child: AbsorbPointer(
-                            child: TextField(
-                              enabled: false,
-                              decoration:
-                                  InputDecoration(hintText: 'Выберите дату'),
-                              controller: expirationDateFieldController,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: AppColors.BORDER_COLOR),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(6))),
+                              child: TextField(
+                                  enabled: false,
+                                  controller: expirationDateFieldController,
+                                  decoration: InputDecoration(
+                                      hintText: 'Выберите дату',
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.all(12)),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.INPUT_TEXT_COLOR)),
                             ),
                           ),
                         ),
@@ -173,8 +186,6 @@ class CreateRequestScreenState extends State<CreateRequestScreen> {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: onSave, child: Center(child: Icon(Icons.check))),
     );
   }
 }

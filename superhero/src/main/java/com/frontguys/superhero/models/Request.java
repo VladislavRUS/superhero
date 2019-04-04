@@ -7,6 +7,7 @@ import java.util.Date;
 public class Request {
     private int id;
     private int customerId;
+    private ClientDetails customerDetails;
     private Integer contractorId;
     private String title;
     private boolean isFinished;
@@ -105,5 +106,13 @@ public class Request {
 
     public void setFinished(boolean finished) {
         isFinished = finished;
+    }
+
+    public ClientDetails getCustomerDetails() {
+        return customerDetails;
+    }
+
+    public void setCustomerDetails(ClientDetails customerDetails) {
+        this.customerDetails = customerDetails;
     }
 }

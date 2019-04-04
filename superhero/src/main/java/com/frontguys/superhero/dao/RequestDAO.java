@@ -4,10 +4,16 @@ import com.frontguys.superhero.mappers.RequestRowMapper;
 import com.frontguys.superhero.models.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class RequestDAO {
@@ -34,12 +40,37 @@ public class RequestDAO {
         return jdbcTemplate.query(query, new Object[]{customerId}, requestRowMapper);
     }
 
-    public void createRequest(Request request) {
+    public Request createRequest(Request request) {
         String query = "insert into request (customer_id, contractor_id, title, description, budget, expiration_date, publish_date, is_confirmed, is_finished) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        Date publishDate = new Date();
+        java.sql.Date publishDate = new java.sql.Date(new Date().getTime());
 
-        jdbcTemplate.update(query, request.getCustomerId(), null, request.getTitle(), request.getDescription(), request.getBudget(), request.getExpirationDate(), publishDate, false, false);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        final PreparedStatementCreator psc = connection -> {
+            final PreparedStatement ps = connection.prepareStatement(query,
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, request.getCustomerId());
+            ps.setObject(2, null);
+            ps.setString(3, request.getTitle());
+            ps.setString(4, request.getDescription());
+            ps.setInt(5, request.getBudget());
+            ps.setDate(6, request.getExpirationDate() == null ? null : new java.sql.Date(request.getExpirationDate().getTime()));
+            ps.setDate(7, publishDate);
+            ps.setBoolean(8, false);
+            ps.setBoolean(9, false);
+            return ps;
+        };
+
+        jdbcTemplate.update(psc, keyHolder);
+
+        for (Map.Entry<String, Object> stringObjectEntry : keyHolder.getKeys().entrySet()) {
+            if (stringObjectEntry.getKey().equals("id")) {
+                return getRequestById(Integer.valueOf(stringObjectEntry.getValue().toString()));
+            }
+        }
+
+        return null;
     }
 
     public void updateRequest(int requestId, Request request) {

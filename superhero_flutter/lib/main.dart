@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:superhero_flutter/constants/routes.dart';
 import 'package:superhero_flutter/screens/app.dart';
+import 'package:superhero_flutter/screens/create_feedback.dart';
 import 'package:superhero_flutter/screens/messages.dart';
 import 'package:superhero_flutter/screens/create_request.dart';
 import 'package:superhero_flutter/screens/detailed_request.dart';
@@ -21,9 +22,6 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       initialRoute: Routes.INITIAL,
       routes: {
         Routes.INITIAL: (context) => InitialScreen(),
@@ -32,7 +30,8 @@ class MainScreen extends StatelessWidget {
         Routes.CREATE_REQUEST: (context) => CreateRequestScreen(),
         Routes.DETAILED_REQUEST: (context) => DetailedRequestScreen(),
         Routes.MESSAGES: (context) => MessagesScreen(),
-        Routes.RESPONSES: (context) => ResponsesScreen()
+        Routes.RESPONSES: (context) => ResponsesScreen(),
+        Routes.CREATE_FEEDBACK: (context) => CreateFeedbackScreen()
       },
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

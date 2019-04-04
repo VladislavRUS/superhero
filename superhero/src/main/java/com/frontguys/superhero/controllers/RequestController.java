@@ -55,6 +55,49 @@ public class RequestController {
         }
     }
 
+    @RequestMapping(value = "/api/v1/auth/requests/{requestId}", method = RequestMethod.GET)
+    public ResponseEntity<Object> getRequests(HttpServletRequest httpServletRequest, @PathVariable int requestId) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        if (ClientRoles.CUSTOMER.equals(role)) {
+            List<Request> customerRequests = requestService.getCustomerRequests(client.getId());
+
+            Request request = requestService.getRequestFromListById(customerRequests, requestId);
+
+            if (request != null) {
+                return new ResponseEntity<>(request, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } else {
+            List<Request> allRequests = requestService.getAllRequests();
+
+            if (ClientRoles.ADMIN.equals(role)) {
+                Request request = requestService.getRequestFromListById(allRequests, requestId);
+
+                if (request != null) {
+                    return new ResponseEntity<>(request, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } else {
+                assert ClientRoles.CONTRACTOR.equals(role);
+
+                List<Request> confirmedRequests = requestService.getConfirmedRequests();
+                Request request = requestService.getRequestFromListById(confirmedRequests, requestId);
+
+                if (request != null) {
+                    return new ResponseEntity<>(request, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            }
+        }
+    }
+
     @RequestMapping(value = "/api/v1/auth/requests", method = RequestMethod.POST)
     public ResponseEntity<Object> createRequest(@RequestBody Request request, HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("Authorization");
@@ -66,8 +109,8 @@ public class RequestController {
         }
 
         request.setCustomerId(client.getId());
-        requestService.createRequest(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+
+        return new ResponseEntity<>(requestService.createRequest(request), HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/api/v1/auth/requests/{id}/confirm", method = RequestMethod.POST)

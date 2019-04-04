@@ -21,4 +21,9 @@ public class ClientService {
     public void updateClient(int id, ClientDetails clientDetails) {
         clientDAO.updateClient(id, clientDetails);
     }
+
+    public ClientDetails getClientDetails(int clientId) {
+        Client clientById = clientDAO.getClientById(clientId);
+        return new ClientDetails(clientById);
+    }
 }

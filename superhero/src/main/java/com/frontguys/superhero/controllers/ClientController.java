@@ -6,13 +6,11 @@ import com.frontguys.superhero.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+@CrossOrigin(value = "*")
 @RestController
 public class ClientController {
     @Autowired
@@ -29,5 +27,13 @@ public class ClientController {
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+    }
+
+    @RequestMapping(value = "/api/v1/auth/clients/current", method = RequestMethod.GET)
+    public ResponseEntity<Object> getCurrentClient(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+
+        return new ResponseEntity<>(new ClientDetails(client), HttpStatus.OK);
     }
 }

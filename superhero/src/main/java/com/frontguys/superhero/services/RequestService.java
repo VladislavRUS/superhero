@@ -5,23 +5,39 @@ import com.frontguys.superhero.models.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class RequestService {
     @Autowired
     RequestDAO requestDAO;
+    @Autowired
+    ClientService clientService;
 
     public List<Request> getAllRequests() {
-        return requestDAO.getAllRequests();
+        return fillRequestListWithClientDetails(requestDAO.getAllRequests());
+    }
+
+    public List<Request> getConfirmedRequests() {
+        List<Request> allRequests = requestDAO.getAllRequests();
+        List<Request> confirmedRequests = new ArrayList<>();
+
+        for (Request request: allRequests) {
+            if (request.isConfirmed()) {
+                confirmedRequests.add(request);
+            }
+        }
+
+        return fillRequestListWithClientDetails(confirmedRequests);
     }
 
     public List<Request> getCustomerRequests(int customerId) {
-        return requestDAO.getCustomerRequests(customerId);
+        return fillRequestListWithClientDetails(requestDAO.getCustomerRequests(customerId));
     }
 
-    public void createRequest(Request request) {
-        requestDAO.createRequest(request);
+    public Request createRequest(Request request) {
+        return fillRequestWithClientDetails(requestDAO.createRequest(request));
     }
 
     public void updateRequest(int requestId, Request request) {
@@ -33,10 +49,33 @@ public class RequestService {
     }
 
     public Request getRequestById(int id) {
-        return requestDAO.getRequestById(id);
+        return fillRequestWithClientDetails(requestDAO.getRequestById(id));
     }
 
     public void finishRequest(int requestId) {
         requestDAO.finishRequest(requestId);
+    }
+
+    public Request getRequestFromListById(List<Request> requests, int requestId) {
+        for (Request req: requests) {
+            if (req.getId() == requestId) {
+                return req;
+            }
+        }
+
+        return null;
+    }
+
+    private Request fillRequestWithClientDetails(Request request) {
+        request.setCustomerDetails(clientService.getClientDetails(request.getCustomerId()));
+        return request;
+    }
+
+    private List<Request> fillRequestListWithClientDetails(List<Request> requests) {
+        for (Request request : requests) {
+            fillRequestWithClientDetails(request);
+        }
+
+        return requests;
     }
 }

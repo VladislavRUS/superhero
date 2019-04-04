@@ -31,17 +31,40 @@ create table request (
   id              serial primary key,
   customer_id     integer references client (id),
   contractor_id   integer references client (id),
+  title           text not null,
   description     text,
   expiration_date date,
   is_confirmed    boolean,
-  response_count  int
+  is_finished     boolean,
+  response_count  int,
+  publish_date    date,
+  budget          int not null
 );
 
-drop table if exists response;
+drop table if exists response cascade;
 
 create table response (
   id            serial primary key,
   request_id    integer references request (id),
   contractor_id integer references client (id),
   date          date
+);
+
+drop table if exists message;
+
+create table message (
+  id          serial primary key,
+  response_id integer references response (id),
+  sender_id   integer references client (id),
+  text        text,
+  timestamp   text
+);
+
+drop table if exists feedback;
+create table feedback (
+  id serial primary key,
+  customer_id integer references client (id),
+  contractor_id integer references client (id),
+  value integer,
+  comment text
 );

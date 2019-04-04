@@ -6,4 +6,5 @@ class Routes {
   static const String DETAILED_REQUEST = '/detailedRequest';
   static const String MESSAGES = '/messages';
   static const String RESPONSES = '/responses';
+  static const String CREATE_FEEDBACK = '/createFeedback';
 }

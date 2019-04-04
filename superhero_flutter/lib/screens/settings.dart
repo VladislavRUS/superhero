@@ -14,6 +14,11 @@ class SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text('Настройки'),
       ),
+      body: Container(
+        child: Center(
+          child: Text('Раздел в разработке'),
+        ),
+      ),
     );
   }
 }

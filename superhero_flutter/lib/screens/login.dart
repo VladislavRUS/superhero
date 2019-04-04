@@ -65,29 +65,28 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.MAIN_COLOR,
+      backgroundColor: AppColors.BACKGROUND_COLOR,
       body: Center(
         child: Container(
           margin: EdgeInsets.all(10),
-          child: Card(
-            elevation: 5,
+          child: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                    margin: EdgeInsets.only(bottom: 20),
+                    margin: EdgeInsets.only(bottom: 30),
                     child: Image.asset('assets/logo.png')),
                 Container(
                   padding: EdgeInsets.all(10),
                   child: Column(
                     children: <Widget>[
                       Container(
-                        child: Input(controller: emailTextEditingController),
+                        child: Input(controller: emailTextEditingController, icon: Icon(Icons.email)),
                         margin: EdgeInsets.only(bottom: 10),
                       ),
                       Container(
-                        child: Input(controller: passwordTextEditingController),
-                        margin: EdgeInsets.only(bottom: 10),
+                        child: Input(controller: passwordTextEditingController, icon: Icon(Icons.lock)),
+                        margin: EdgeInsets.only(bottom: 20),
                       ),
                       Button(
                         text: 'Войти',

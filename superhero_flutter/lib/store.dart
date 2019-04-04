@@ -7,8 +7,8 @@ import 'package:superhero_flutter/models/message.dart';
 import 'package:superhero_flutter/models/request.dart';
 import 'package:superhero_flutter/models/response.dart';
 
-String baseUrl = 'http://10.0.2.2:8080';
-//String baseUrl = 'http://b975cbb4.ngrok.io';
+//String baseUrl = 'http://10.0.2.2:8080';
+String baseUrl = 'https://0f4c53b9.ngrok.io';
 
 class Store extends Model {
   String token;
@@ -144,5 +144,17 @@ class Store extends Model {
     });
 
     notifyListeners();
+  }
+
+  createFeedback(String comment, int value, int contractorId) async {
+    String url =
+        baseUrl + '/api/v1/auth/feedbacks';
+    var body = {
+      "comment": comment,
+      "value": value,
+      "contractorId": contractorId
+    };
+
+    await Requests.post(url, headers: {'Authorization': token}, body: body);
   }
 }
