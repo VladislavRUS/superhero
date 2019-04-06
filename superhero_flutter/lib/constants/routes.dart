@@ -7,4 +7,6 @@ class Routes {
   static const String MESSAGES = '/messages';
   static const String RESPONSES = '/responses';
   static const String CREATE_FEEDBACK = '/createFeedback';
+  static const String CREATE_RESPONSE = '/createResponse';
+  static const String FEEDBACKS = '/feedbacks';
 }

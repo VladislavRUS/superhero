@@ -1,10 +1,13 @@
 package com.frontguys.superhero.controllers;
 
 import com.frontguys.superhero.constants.ClientRoles;
+import com.frontguys.superhero.constants.SystemMessages;
 import com.frontguys.superhero.models.Client;
+import com.frontguys.superhero.models.Message;
 import com.frontguys.superhero.models.Request;
 import com.frontguys.superhero.models.Response;
 import com.frontguys.superhero.services.ClientService;
+import com.frontguys.superhero.services.MessageService;
 import com.frontguys.superhero.services.RequestService;
 import com.frontguys.superhero.services.ResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(value = "*")
@@ -25,6 +27,8 @@ public class RequestController {
     RequestService requestService;
     @Autowired
     ResponseService responseService;
+    @Autowired
+    MessageService messageService;
 
     @RequestMapping(value = "/api/v1/auth/requests", method = RequestMethod.GET)
     public ResponseEntity<Object> getRequests(HttpServletRequest httpServletRequest) {
@@ -36,119 +40,8 @@ public class RequestController {
             return new ResponseEntity<>(requestService.getCustomerRequests(client.getId()), HttpStatus.OK);
         } else {
             List<Request> allRequests = requestService.getAllRequests();
-
-            if (ClientRoles.ADMIN.equals(role)) {
-                return new ResponseEntity<>(allRequests, HttpStatus.OK);
-            } else {
-                assert ClientRoles.CONTRACTOR.equals(role);
-
-                List<Request> confirmedRequests = new ArrayList<>();
-
-                for (Request request : allRequests) {
-                    if (request.isConfirmed()) {
-                        confirmedRequests.add(request);
-                    }
-                }
-
-                return new ResponseEntity<>(confirmedRequests, HttpStatus.OK);
-            }
+            return new ResponseEntity<>(allRequests, HttpStatus.OK);
         }
-    }
-
-    @RequestMapping(value = "/api/v1/auth/requests/{requestId}", method = RequestMethod.GET)
-    public ResponseEntity<Object> getRequests(HttpServletRequest httpServletRequest, @PathVariable int requestId) {
-        String token = httpServletRequest.getHeader("Authorization");
-        Client client = clientService.getClientByToken(token);
-        String role = client.getRole();
-
-        if (ClientRoles.CUSTOMER.equals(role)) {
-            List<Request> customerRequests = requestService.getCustomerRequests(client.getId());
-
-            Request request = requestService.getRequestFromListById(customerRequests, requestId);
-
-            if (request != null) {
-                return new ResponseEntity<>(request, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-        } else {
-            List<Request> allRequests = requestService.getAllRequests();
-
-            if (ClientRoles.ADMIN.equals(role)) {
-                Request request = requestService.getRequestFromListById(allRequests, requestId);
-
-                if (request != null) {
-                    return new ResponseEntity<>(request, HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-            } else {
-                assert ClientRoles.CONTRACTOR.equals(role);
-
-                List<Request> confirmedRequests = requestService.getConfirmedRequests();
-                Request request = requestService.getRequestFromListById(confirmedRequests, requestId);
-
-                if (request != null) {
-                    return new ResponseEntity<>(request, HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-            }
-        }
-    }
-
-    @RequestMapping(value = "/api/v1/auth/requests", method = RequestMethod.POST)
-    public ResponseEntity<Object> createRequest(@RequestBody Request request, HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        Client client = clientService.getClientByToken(token);
-        String role = client.getRole();
-
-        if (ClientRoles.CONTRACTOR.equals(role)) {
-            return new ResponseEntity<>("Contractors cannot create requests", HttpStatus.FORBIDDEN);
-        }
-
-        request.setCustomerId(client.getId());
-
-        return new ResponseEntity<>(requestService.createRequest(request), HttpStatus.CREATED);
-    }
-
-    @RequestMapping(value = "/api/v1/auth/requests/{id}/confirm", method = RequestMethod.POST)
-    public ResponseEntity<Object> confirmRequest(HttpServletRequest httpServletRequest, @PathVariable int id) {
-        String token = httpServletRequest.getHeader("Authorization");
-        Client client = clientService.getClientByToken(token);
-        String role = client.getRole();
-
-        if (ClientRoles.ADMIN.equals(role)) {
-            requestService.confirmRequest(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("You are not allowed to confirm requests", HttpStatus.FORBIDDEN);
-        }
-    }
-
-    @RequestMapping(value = "/api/v1/auth/requests/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Object> updateRequest(@RequestBody Request newRequest, HttpServletRequest httpServletRequest, @PathVariable int id) {
-        String token = httpServletRequest.getHeader("Authorization");
-        Client client = clientService.getClientByToken(token);
-        String role = client.getRole();
-
-        if (ClientRoles.CONTRACTOR.equals(role)) {
-            return new ResponseEntity<>("Contractors cannot update requests", HttpStatus.FORBIDDEN);
-        }
-
-        Request request = requestService.getRequestById(id);
-
-        // Customer can update only his requests
-        if (ClientRoles.CUSTOMER.equals(role)) {
-            if (request.getCustomerId() != client.getId()) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
-        }
-
-        newRequest.setResponseCount(request.getResponseCount());
-        requestService.updateRequest(id, newRequest);
-        return new ResponseEntity<>(requestService.getRequestById(id), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/v1/auth/requests/{id}/responses", method = RequestMethod.GET)
@@ -168,6 +61,37 @@ public class RequestController {
 
         List<Response> responses = responseService.getResponsesByRequestId(id);
         return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/api/v1/auth/requests/{requestId}/messages", method = RequestMethod.GET)
+    public ResponseEntity<Object> getRequestSystemMessages(HttpServletRequest httpServletRequest, @PathVariable int requestId) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        Request request = requestService.getRequestById(requestId);
+
+        // Customer can see only his responses
+        if (ClientRoles.CUSTOMER.equals(role)) {
+            if (request.getCustomerId() != client.getId()) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        if (request.getContractorId() == null) {
+            return new ResponseEntity<>("Is not assigned", HttpStatus.BAD_REQUEST);
+        }
+
+        List<Response> responsesByRequestId = responseService.getResponsesByRequestId(requestId);
+        for (Response response : responsesByRequestId) {
+            if (response.getContractorId() == request.getContractorId()) {
+                List<Message> messagesByResponseId = messageService.getMessagesByResponseId(response.getId());
+                return new ResponseEntity<>(messagesByResponseId, HttpStatus.OK);
+            }
+        }
+
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "/api/v1/auth/requests/{requestId}/assign", method = RequestMethod.POST)
@@ -191,8 +115,24 @@ public class RequestController {
             return new ResponseEntity<>("No response from that contractor", HttpStatus.FORBIDDEN);
         }
 
-        request.setContractorId(contractorId);
-        requestService.updateRequest(requestId, request);
+        if (request.getContractorId() != null) {
+            return new ResponseEntity<>("Already assigned", HttpStatus.BAD_REQUEST);
+        }
+
+
+        Message message = new Message();
+        message.setSystem(true);
+        message.setText(SystemMessages.ASSIGNED);
+
+        List<Response> allResponses = responseService.getAllResponses();
+
+        for (Response resp : allResponses) {
+            if (resp.getContractorId() == contractorId) {
+                requestService.assignRequest(requestId, contractorId);
+                messageService.createMessage(resp.getId(), message);
+                break;
+            }
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -210,9 +150,17 @@ public class RequestController {
             if (request.getCustomerId() != client.getId()) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
+        } else if (ClientRoles.CONTRACTOR.equals(role)) {
+            if (request.getContractorId() != client.getId()) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         }
 
-        if (request.isFinished()) {
+        if (ClientRoles.CUSTOMER.equals(role) && request.isFinishedByCustomer()) {
+            return new ResponseEntity<>("Already finished", HttpStatus.BAD_REQUEST);
+        }
+
+        if (ClientRoles.CONTRACTOR.equals(role) && request.isFinishedByContractor()) {
             return new ResponseEntity<>("Already finished", HttpStatus.BAD_REQUEST);
         }
 
@@ -220,7 +168,18 @@ public class RequestController {
             return new ResponseEntity<>("No contractor", HttpStatus.BAD_REQUEST);
         }
 
-        requestService.finishRequest(requestId);
+        Message message = new Message();
+        message.setSystem(true);
+
+        if (ClientRoles.CONTRACTOR.equals(role)) {
+            message.setText(SystemMessages.FINISH_CONTRACTOR);
+            requestService.finishContractorRequest(requestId);
+        } else if (ClientRoles.CUSTOMER.equals(role)) {
+            requestService.finishCustomerRequest(requestId);
+            message.setText(SystemMessages.FINISH_CUSTOMER);
+        }
+
+        messageService.createMessageByRequest(message, request);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

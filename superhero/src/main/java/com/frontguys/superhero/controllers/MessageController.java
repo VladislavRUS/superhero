@@ -36,7 +36,15 @@ public class MessageController {
         String role = client.getRole();
 
         Response responseById = responseService.getResponseById(responseId);
+        if (responseById == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
         Request requestById = requestService.getRequestById(responseById.getRequestId());
+
+        if (requestById == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         switch (role) {
             case ClientRoles.CUSTOMER:

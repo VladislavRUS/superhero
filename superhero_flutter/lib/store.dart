@@ -7,8 +7,8 @@ import 'package:superhero_flutter/models/message.dart';
 import 'package:superhero_flutter/models/request.dart';
 import 'package:superhero_flutter/models/response.dart';
 
-//String baseUrl = 'http://10.0.2.2:8080';
-String baseUrl = 'https://0f4c53b9.ngrok.io';
+String baseUrl = 'http://10.0.2.2:8080';
+//String baseUrl = 'http://c1139db1.ngrok.io';
 
 class Store extends Model {
   String token;
@@ -69,10 +69,12 @@ class Store extends Model {
     notifyListeners();
   }
 
-  respond(int requestId) async {
-    String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    var body = {'requestId': requestId, 'date': date};
+  respond(int requestId, String plannedDate, String payment) async {
+    var body = {
+      'requestId': requestId,
+      'plannedDate': plannedDate,
+      'payment': payment
+    };
 
     await Requests.post(baseUrl + '/api/v1/auth/responses',
         headers: {'Authorization': token}, body: body);
@@ -87,7 +89,6 @@ class Store extends Model {
         await Requests.get(url, headers: {'Authorization': token}, json: true);
 
     responses = List<Response>();
-
     jsonResponses.forEach((jsonResponse) {
       responses.add(Response.fromJson(jsonResponse));
     });
@@ -103,7 +104,6 @@ class Store extends Model {
         await Requests.get(url, headers: {'Authorization': token}, json: true);
 
     messages = List<Message>();
-
     jsonMessages.forEach((jsonMessage) {
       messages.add(Message.fromJson(jsonMessage));
     });
@@ -122,20 +122,20 @@ class Store extends Model {
     String url = baseUrl +
         '/api/v1/auth/requests/${requestId.toString()}/assign?contractorId=${contractorId.toString()}';
     await Requests.post(url, headers: {'Authorization': token});
-    detailedRequest.contractorId = contractorId;
+    notifyListeners();
   }
 
   finish(int requestId) async {
     String url =
         baseUrl + '/api/v1/auth/requests/${requestId.toString()}/finish';
     await Requests.post(url, headers: {'Authorization': token});
-    detailedRequest.isFinished = true;
   }
 
   fetchFeedbacks(int contractorId) async {
-    String url =
-        baseUrl + '/api/v1/auth/feedbacks?contractorId=${contractorId.toString()}';
-    var jsonFeedbacks = await Requests.get(url, headers: {'Authorization': token}, json: true);
+    String url = baseUrl +
+        '/api/v1/auth/feedbacks?contractorId=${contractorId.toString()}';
+    var jsonFeedbacks =
+        await Requests.get(url, headers: {'Authorization': token}, json: true);
 
     feedbacks = List<Feedback>();
 
@@ -147,8 +147,7 @@ class Store extends Model {
   }
 
   createFeedback(String comment, int value, int contractorId) async {
-    String url =
-        baseUrl + '/api/v1/auth/feedbacks';
+    String url = baseUrl + '/api/v1/auth/feedbacks';
     var body = {
       "comment": comment,
       "value": value,

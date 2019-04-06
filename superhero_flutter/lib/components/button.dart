@@ -19,16 +19,25 @@ class Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-        child: isLoading
-            ? SizedBox(
-                width: 15,
-                height: 15,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-            : Text(text, style: TextStyle(color: Colors.white)),
-        onPressed: _onTap,
-        color: AppColors.MAIN_COLOR);
+    return ClipRRect(
+      borderRadius: BorderRadius.all(Radius.circular(7)),
+      child: Material(
+        color: AppColors.MAIN_COLOR,
+        child: InkWell(
+          onTap: _onTap,
+          child: Container(
+              padding:
+                  EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
+              child: Opacity(
+                opacity: isLoading ? 0.7 : 1,
+                child: Text(text,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400)),
+              )),
+        ),
+      ),
+    );
   }
 }

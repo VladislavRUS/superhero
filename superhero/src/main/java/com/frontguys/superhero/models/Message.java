@@ -1,11 +1,14 @@
 package com.frontguys.superhero.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Message {
     private int id;
     private int responseId;
-    private int senderId;
+    private Integer senderId;
     private String text;
     private String timestamp;
+    private boolean isSystem;
 
     public int getId() {
         return id;
@@ -23,11 +26,12 @@ public class Message {
         this.responseId = responseId;
     }
 
-    public int getSenderId() {
+
+    public Integer getSenderId() {
         return senderId;
     }
 
-    public void setSenderId(int senderId) {
+    public void setSenderId(Integer senderId) {
         this.senderId = senderId;
     }
 
@@ -45,5 +49,14 @@ public class Message {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @JsonProperty(value = "isSystem")
+    public boolean isSystem() {
+        return isSystem;
+    }
+
+    public void setSystem(boolean system) {
+        isSystem = system;
     }
 }

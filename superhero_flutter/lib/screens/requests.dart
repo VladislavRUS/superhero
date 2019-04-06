@@ -43,32 +43,51 @@ class RequestsScreenState extends State<RequestsScreen> {
         });
   }
 
-  Widget getTitle(String text) {
+  Widget getTitle(String id) {
     return Container(
-        margin: EdgeInsets.only(bottom: 5),
-        child: Text(text,
+        margin: EdgeInsets.only(bottom: 10),
+        child: Text('Заявка №${id}',
             style: TextStyle(
-                fontSize: 14,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.TEXT_COLOR)));
   }
 
   Widget getBudget(int budget) {
-    return Container(
-        margin: EdgeInsets.only(bottom: 5),
-        child: Text(budget.toString() + ' тыс.',
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: AppColors.TEXT_COLOR)));
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Container(
+            margin: EdgeInsets.only(right: 7),
+            child: Opacity(
+                opacity: 0.4, child: Icon(Icons.monetization_on, size: 18))),
+        Opacity(
+          opacity: 0.7,
+          child: Container(
+              child: Text(budget.toString() + ' тыс. руб',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.TEXT_COLOR))),
+        ),
+      ],
+    );
   }
 
-  Widget getExpirationDate(String expirationDate) {
+  Widget getInfo(Request request) {
+    String infoText;
+
+    if (request.customerDetails.isLegalEntity) {
+      infoText = request.customerDetails.companyName;
+    } else {
+      infoText = request.customerDetails.fullName;
+    }
+
     return Opacity(
       opacity: 0.7,
       child: Container(
           margin: EdgeInsets.only(bottom: 10),
-          child: Text(expirationDate,
+          child: Text(infoText,
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -76,25 +95,57 @@ class RequestsScreenState extends State<RequestsScreen> {
     );
   }
 
-  Widget getDescription(String description) {
+  Widget getTypeValue(String typeValue) {
     return Container(
         margin: EdgeInsets.only(bottom: 10),
-        child: Text(description,
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: AppColors.TEXT_COLOR)));
+        child: Opacity(
+          opacity: 0.85,
+          child: Text(typeValue,
+              style: TextStyle(
+                  fontSize: 14,
+                  height: 1.2,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.TEXT_COLOR)),
+        ));
+  }
+
+  Widget getAddress(String address) {
+    return Container(
+        margin: EdgeInsets.only(bottom: 10),
+        child: Opacity(
+          opacity: 0.85,
+          child: Text(address,
+              style: TextStyle(
+                  fontSize: 14,
+                  height: 1.2,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.TEXT_COLOR)),
+        ));
   }
 
   Widget getPublishDate(String publishDate) {
-    return Opacity(
-      opacity: 0.7,
-      child: Container(
-          child: Text(publishDate,
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.TEXT_COLOR))),
+    return Row(
+      children: <Widget>[
+        Opacity(
+          opacity: 0.7,
+          child: Container(
+            margin: EdgeInsets.only(right: 7),
+            child: Icon(
+              Icons.access_time,
+              size: 16,
+            ),
+          ),
+        ),
+        Opacity(
+          opacity: 0.7,
+          child: Container(
+              child: Text(publishDate,
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.TEXT_COLOR))),
+        ),
+      ],
     );
   }
 
@@ -102,9 +153,11 @@ class RequestsScreenState extends State<RequestsScreen> {
     return Material(
       color: Colors.white,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          onListTileTap(request);
+        },
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
           decoration: BoxDecoration(
               border: Border(
                   bottom: isLast
@@ -117,10 +170,9 @@ class RequestsScreenState extends State<RequestsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    getTitle(request.title),
-                    getBudget(request.budget),
-                    getExpirationDate(request.expirationDate),
-                    getDescription(request.description),
+                    getTitle(request.id.toString()),
+                    getTypeValue(request.typeValue),
+                    getAddress(request.address),
                     getPublishDate(request.publishDate)
                   ],
                 ),
@@ -131,7 +183,12 @@ class RequestsScreenState extends State<RequestsScreen> {
                 child: Opacity(
                   opacity: 0.7,
                   child: Column(
-                    children: <Widget>[Icon(Icons.chevron_right)],
+                    children: <Widget>[
+                      Icon(
+                        Icons.chevron_right,
+                        size: 30,
+                      )
+                    ],
                   ),
                 ),
               )
@@ -163,21 +220,6 @@ class RequestsScreenState extends State<RequestsScreen> {
     return false;
   }
 
-  List<Widget> getActions() {
-    List<Widget> actions = List();
-
-    if (canAddRequest()) {
-      actions.add(IconButton(
-          onPressed: addRequest,
-          icon: Icon(
-            Icons.add,
-            color: AppColors.TEXT_COLOR,
-          )));
-    }
-
-    return actions;
-  }
-
   @override
   Widget build(BuildContext context) {
     ScopedModel.of<Store>(context, rebuildOnChange: true);
@@ -185,10 +227,9 @@ class RequestsScreenState extends State<RequestsScreen> {
     return Scaffold(
       backgroundColor: AppColors.BACKGROUND_COLOR,
       appBar: AppBar(
-          actions: getActions(),
           title: AppBarText(text: 'Заявки'),
-          elevation: 0,
-          backgroundColor: Colors.transparent),
+          elevation: 0.3,
+          backgroundColor: Colors.white),
       body: RefreshIndicator(
           key: _refreshIndicatorKey, child: buildList(), onRefresh: init),
     );

@@ -8,8 +8,9 @@ public class Response {
     private int contractorId;
     private Date date;
     private ClientDetails contractorDetails;
-    private ClientDetails customerDetails;
     private Request request;
+    private int payment;
+    private Date plannedDate;
 
     public int getId() {
         return id;
@@ -43,27 +44,35 @@ public class Response {
         this.date = date;
     }
 
-    public ClientDetails getContractorDetails() {
-        return contractorDetails;
-    }
-
-    public void setContractorDetails(ClientDetails contractorDetails) {
-        this.contractorDetails = contractorDetails;
-    }
-
-    public ClientDetails getCustomerDetails() {
-        return customerDetails;
-    }
-
-    public void setCustomerDetails(ClientDetails customerDetails) {
-        this.customerDetails = customerDetails;
-    }
-
     public Request getRequest() {
         return request;
     }
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public int getPayment() {
+        return payment;
+    }
+
+    public void setPayment(int payment) {
+        this.payment = payment;
+    }
+
+    public Date getPlannedDate() {
+        return plannedDate;
+    }
+
+    public void setPlannedDate(Date plannedDate) {
+        this.plannedDate = plannedDate;
+    }
+
+    public ClientDetails getContractorDetails() {
+        return contractorDetails;
+    }
+
+    public void setContractorDetails(ClientDetails contractorDetails) {
+        this.contractorDetails = contractorDetails;
     }
 }

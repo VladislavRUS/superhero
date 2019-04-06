@@ -5,18 +5,20 @@ class Response {
   int id;
   int requestId;
   int contractorId;
-  String date;
-  ClientDetails customerDetails;
   ClientDetails contractorDetails;
+  String date;
   Request request;
+  int payment;
+  String plannedDate;
 
   Response.fromJson(map) {
     id = map['id'];
     requestId = map['requestId'];
     contractorId = map['contractorId'];
-    date = map['date'];
-    customerDetails = ClientDetails.fromJson(map['customerDetails']);
     contractorDetails = ClientDetails.fromJson(map['contractorDetails']);
+    date = map['date'];
     request = Request.fromJson(map['request']);
+    payment = map['payment'];
+    plannedDate = map['plannedDate'];
   }
 }

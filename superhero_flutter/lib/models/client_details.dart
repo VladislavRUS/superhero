@@ -4,6 +4,7 @@ class ClientDetails {
   String role;
   String firstName;
   String lastName;
+  String fullName;
   String companyName;
   String address;
   String about;
@@ -15,6 +16,7 @@ class ClientDetails {
     role = map['role'];
     firstName = map['firstName'] ?? '';
     lastName = map['lastName'] ?? '';
+    fullName = firstName + ' ' + lastName;
     companyName = map['companyName'] ?? '';
     address = map['address'] ?? '';
     about = map['about'] ?? '';

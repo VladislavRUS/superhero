@@ -4,4 +4,5 @@ class Actions {
   static const String ASSIGN = 'assign';
   static const String FINISH = 'finish';
   static const String CREATE_FEEDBACK = 'createFeedback';
+  static const String WATCH_INFO = 'watchInfo';
 }

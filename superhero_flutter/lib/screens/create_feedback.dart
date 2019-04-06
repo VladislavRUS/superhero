@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/components/app_bar_text.dart';
 import 'package:superhero_flutter/components/button.dart';
+import 'package:superhero_flutter/components/input.dart';
+import 'package:superhero_flutter/constants/app_colors.dart';
 import 'package:superhero_flutter/store.dart';
 
 class CreateFeedbackScreen extends StatefulWidget {
@@ -50,18 +53,40 @@ class CreateFeedbackScreenState extends State<CreateFeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Комментарий')),
+      appBar: AppBar(
+        elevation: 0.3,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppColors.HEADER_TEXT_COLOR,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+        title: AppBarText(text: 'Отзыв'),
+      ),
       body: Container(
+        padding: EdgeInsets.all(20),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: commentController,
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Input(
+                hintText: 'Напишите отзыв',
+                maxLines: 5,
+                controller: commentController,
+              ),
             ),
-            TextField(
-                keyboardType: TextInputType.numberWithOptions(),
-                controller: valueController),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Input(
+                  hintText: "Оцените от 1 до 5",
+                  inputType: TextInputType.numberWithOptions(),
+                  controller: valueController),
+            ),
             Button(
-                text: 'Сохранить отзыв',
+                text: 'Сохранить',
                 onTap: onCreateFeedback,
                 isLoading: isLoading)
           ],

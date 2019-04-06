@@ -1,10 +1,13 @@
 package com.frontguys.superhero.controllers;
 
 import com.frontguys.superhero.constants.ClientRoles;
+import com.frontguys.superhero.constants.SystemMessages;
 import com.frontguys.superhero.models.Client;
+import com.frontguys.superhero.models.Message;
 import com.frontguys.superhero.models.Request;
 import com.frontguys.superhero.models.Response;
 import com.frontguys.superhero.services.ClientService;
+import com.frontguys.superhero.services.MessageService;
 import com.frontguys.superhero.services.RequestService;
 import com.frontguys.superhero.services.ResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(value = "*")
 @RestController
@@ -24,12 +30,18 @@ public class ResponseController {
     RequestService requestService;
     @Autowired
     ClientService clientService;
+    @Autowired
+    MessageService messageService;
 
     @RequestMapping(value = "/api/v1/auth/responses", method = RequestMethod.POST)
     public ResponseEntity<String> createResponse(@RequestBody Response response, HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("Authorization");
         Client client = clientService.getClientByToken(token);
         String role = client.getRole();
+
+        if (response.getPlannedDate() == null) {
+            return new ResponseEntity<>("Fill response", HttpStatus.NOT_ACCEPTABLE);
+        }
 
         if (ClientRoles.CUSTOMER.equals(role)) {
             return new ResponseEntity<>("Customers cannot create responses", HttpStatus.FORBIDDEN);
@@ -41,38 +53,18 @@ public class ResponseController {
                 return new ResponseEntity<>("Request does not exists", HttpStatus.NOT_FOUND);
             }
 
-            if (!request.isConfirmed()) {
-                return new ResponseEntity<>("Request is not confirmed", HttpStatus.BAD_REQUEST);
-            } else {
-                response.setContractorId(client.getId());
-                responseService.createResponse(response);
-                return new ResponseEntity<>(HttpStatus.CREATED);
-            }
-        }
-    }
+            response.setContractorId(client.getId());
+            Response newResponse = responseService.createResponse(response);
+            Map<String, String> msgParams = new HashMap<>();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String format = simpleDateFormat.format(response.getPlannedDate());
+            msgParams.put("plannedDate", format);
+            msgParams.put("payment", String.valueOf(response.getPayment()));
+            Message messageWithParams = messageService.createMessageWithParams(SystemMessages.CREATE_RESPONSE, msgParams);
+            messageWithParams.setSenderId(client.getId());
+            messageService.createMessage(newResponse.getId(), messageWithParams);
 
-    @RequestMapping(value = "/api/v1/auth/responses/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deleteResponse(HttpServletRequest httpServletRequest, @PathVariable int id) {
-        String token = httpServletRequest.getHeader("Authorization");
-        Client client = clientService.getClientByToken(token);
-        String role = client.getRole();
-
-        if (ClientRoles.CUSTOMER.equals(role)) {
-            return new ResponseEntity<>("Customers cannot delete responses", HttpStatus.FORBIDDEN);
-        } else {
-            if (ClientRoles.ADMIN.equals(role)) {
-                responseService.deleteResponse(id);
-                return new ResponseEntity<>(HttpStatus.OK);
-            } else {
-                Response response = responseService.getResponseById(id);
-
-                if (response.getContractorId() == client.getId()) {
-                    responseService.deleteResponse(id);
-                    return new ResponseEntity<>(HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-                }
-            }
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
     }
 

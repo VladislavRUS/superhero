@@ -12,21 +12,15 @@ public class RequestRowMapper implements RowMapper {
         Request request = new Request();
         request.setId(resultSet.getInt("id"));
         request.setCustomerId(resultSet.getInt("customer_id"));
-
-        if (resultSet.getObject("contractor_id") != null) {
-            request.setContractorId(resultSet.getInt("contractor_id"));
-        } else {
-            request.setContractorId(null);
-        }
-
+        request.setContractorId((Integer) resultSet.getObject("contractor_id"));
+        request.setType(resultSet.getString("type"));
+        request.setAddress(resultSet.getString("address"));
         request.setExpirationDate(resultSet.getDate("expiration_date"));
         request.setPublishDate(resultSet.getDate("publish_date"));
-        request.setDescription(resultSet.getString("description"));
-        request.setConfirmed(resultSet.getBoolean("is_confirmed"));
+        request.setFinishedByContractor(resultSet.getBoolean("is_finished_by_contractor"));
+        request.setFinishedByCustomer(resultSet.getBoolean("is_finished_by_customer"));
+        request.setApproved(resultSet.getBoolean("is_approved"));
         request.setResponseCount(resultSet.getInt("response_count"));
-        request.setTitle(resultSet.getString("title"));
-        request.setBudget(resultSet.getInt("budget"));
-        request.setFinished(resultSet.getBoolean("is_finished"));
 
         return request;
     }

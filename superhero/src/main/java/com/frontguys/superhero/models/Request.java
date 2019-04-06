@@ -6,16 +6,17 @@ import java.util.Date;
 
 public class Request {
     private int id;
-    private int customerId;
+    private Integer customerId;
     private ClientDetails customerDetails;
     private Integer contractorId;
-    private String title;
-    private boolean isFinished;
-    private Integer budget;
-    private String description;
-    private boolean isConfirmed;
+    private ClientDetails contractorDetails;
+    private String type;
+    private String address;
     private Date expirationDate;
     private Date publishDate;
+    private boolean isFinishedByCustomer;
+    private boolean isFinishedByContractor;
+    private boolean isApproved;
     private int responseCount;
 
     public int getId() {
@@ -26,28 +27,20 @@ public class Request {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Integer getBudget() {
-        return budget;
-    }
-
-    public void setBudget(Integer budget) {
-        this.budget = budget;
-    }
-
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
+    }
+
+    public ClientDetails getCustomerDetails() {
+        return customerDetails;
+    }
+
+    public void setCustomerDetails(ClientDetails customerDetails) {
+        this.customerDetails = customerDetails;
     }
 
     public Integer getContractorId() {
@@ -58,21 +51,28 @@ public class Request {
         this.contractorId = contractorId;
     }
 
-    public String getDescription() {
-        return description;
+    public ClientDetails getContractorDetails() {
+        return contractorDetails;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setContractorDetails(ClientDetails contractorDetails) {
+        this.contractorDetails = contractorDetails;
     }
 
-    @JsonProperty(value="isConfirmed")
-    public boolean isConfirmed() {
-        return isConfirmed;
+    public String getType() {
+        return type;
     }
 
-    public void setConfirmed(boolean confirmed) {
-        isConfirmed = confirmed;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Date getExpirationDate() {
@@ -83,14 +83,6 @@ public class Request {
         this.expirationDate = expirationDate;
     }
 
-    public int getResponseCount() {
-        return responseCount;
-    }
-
-    public void setResponseCount(int responseCount) {
-        this.responseCount = responseCount;
-    }
-
     public Date getPublishDate() {
         return publishDate;
     }
@@ -99,20 +91,38 @@ public class Request {
         this.publishDate = publishDate;
     }
 
-    @JsonProperty(value="isFinished")
-    public boolean isFinished() {
-        return isFinished;
+    @JsonProperty(value = "isFinishedByCustomer")
+    public boolean isFinishedByCustomer() {
+        return isFinishedByCustomer;
     }
 
-    public void setFinished(boolean finished) {
-        isFinished = finished;
+    public void setFinishedByCustomer(boolean finishedByCustomer) {
+        isFinishedByCustomer = finishedByCustomer;
     }
 
-    public ClientDetails getCustomerDetails() {
-        return customerDetails;
+    @JsonProperty(value = "isFinishedByContractor")
+    public boolean isFinishedByContractor() {
+        return isFinishedByContractor;
     }
 
-    public void setCustomerDetails(ClientDetails customerDetails) {
-        this.customerDetails = customerDetails;
+    public void setFinishedByContractor(boolean finishedByContractor) {
+        isFinishedByContractor = finishedByContractor;
+    }
+
+    @JsonProperty(value = "isApproved")
+    public boolean isApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        isApproved = approved;
+    }
+
+    public int getResponseCount() {
+        return responseCount;
+    }
+
+    public void setResponseCount(int responseCount) {
+        this.responseCount = responseCount;
     }
 }

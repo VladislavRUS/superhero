@@ -13,9 +13,10 @@ public class MessageRowMapper implements RowMapper {
 
         message.setId(resultSet.getInt("id"));
         message.setResponseId(resultSet.getInt("response_id"));
-        message.setSenderId(resultSet.getInt("sender_id"));
+        message.setSenderId((Integer) resultSet.getObject("sender_id"));
         message.setText(resultSet.getString("text"));
         message.setTimestamp(resultSet.getString("timestamp"));
+        message.setSystem(resultSet.getBoolean("is_system"));
 
         return message;
     }

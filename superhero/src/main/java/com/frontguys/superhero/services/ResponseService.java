@@ -3,7 +3,6 @@ package com.frontguys.superhero.services;
 import com.frontguys.superhero.dao.ClientDAO;
 import com.frontguys.superhero.dao.RequestDAO;
 import com.frontguys.superhero.dao.ResponseDAO;
-import com.frontguys.superhero.models.Client;
 import com.frontguys.superhero.models.ClientDetails;
 import com.frontguys.superhero.models.Request;
 import com.frontguys.superhero.models.Response;
@@ -21,11 +20,13 @@ public class ResponseService {
     @Autowired
     ClientDAO clientDAO;
 
-    public void createResponse(Response response) {
-        responseDAO.createResponse(response);
+    public Response createResponse(Response response) {
+        Response newResponse = responseDAO.createResponse(response);
         Request request = requestDAO.getRequestById(response.getRequestId());
         request.setResponseCount(request.getResponseCount() + 1);
-        requestDAO.updateRequest(request.getId(), request);
+        requestDAO.setResponseCount(request.getId(), request.getResponseCount());
+
+        return newResponse;
     }
 
     public Response getResponseById(int responseId) {
@@ -53,30 +54,21 @@ public class ResponseService {
     }
 
     public List<Response> getAllResponses() {
-        return responseDAO.getAllResponses();
+        List<Response> allResponses = responseDAO.getAllResponses();
+        fillResponses(allResponses);
+        return allResponses;
     }
 
     private void fillResponses(List<Response> responses) {
         for (Response response : responses) {
-            Client contractor = clientDAO.getClientById(response.getContractorId());
-            ClientDetails contractorDetails = new ClientDetails(contractor);
-            response.setContractorDetails(contractorDetails);
-
             Request request = requestDAO.getRequestById(response.getRequestId());
+            request.setCustomerDetails(new ClientDetails(clientDAO.getClientById(request.getCustomerId())));
+            if (request.getContractorId() != null) {
+                request.setCustomerDetails(new ClientDetails(clientDAO.getClientById(request.getContractorId())));
+            }
             response.setRequest(request);
-
-            Client customer = clientDAO.getClientById(request.getCustomerId());
-            ClientDetails customerDetails = new ClientDetails(customer);
-            response.setCustomerDetails(customerDetails);
+            response.setContractorDetails(new ClientDetails(clientDAO.getClientById(response.getContractorId())));
         }
-    }
-
-    public void deleteResponse(int id) {
-        Response response = getResponseById(id);
-        Request request = requestDAO.getRequestById(response.getRequestId());
-        responseDAO.deleteResponse(id);
-        request.setResponseCount(request.getResponseCount() - 1);
-        requestDAO.updateRequest(request.getId(), request);
     }
 
     public boolean hasResponseWithContractorId(List<Response> responses, int contractorId) {
@@ -96,7 +88,7 @@ public class ResponseService {
         boolean workedTogether = false;
 
         for (Response response : responses) {
-            if (response.getContractorId() == contractorId && response.getCustomerDetails().getId() == customerId) {
+            if (response.getContractorId() == contractorId && response.getRequest().getCustomerId() == customerId) {
                 workedTogether = true;
                 break;
             }

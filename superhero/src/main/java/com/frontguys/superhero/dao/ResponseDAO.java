@@ -4,9 +4,16 @@ import com.frontguys.superhero.mappers.ResponseRowMapper;
 import com.frontguys.superhero.models.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ResponseDAO {
@@ -14,19 +21,45 @@ public class ResponseDAO {
     JdbcTemplate jdbcTemplate;
     private ResponseRowMapper responseRowMapper = new ResponseRowMapper();
 
-    public void createResponse(Response response) {
+//    public void createResponse(Response response) {
+//        String query = "insert into response (request_id, contractor_id, date) values (?, ?, ?)";
+//        jdbcTemplate.update(query, response.getRequestId(), response.getContractorId(), response.getDate());
+//    }
+
+    public Response createResponse(Response response) {
         String query = "insert into response (request_id, contractor_id, date) values (?, ?, ?)";
-        jdbcTemplate.update(query, response.getRequestId(), response.getContractorId(), response.getDate());
+
+        java.sql.Date date = new java.sql.Date(new Date().getTime());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        final PreparedStatementCreator psc = connection -> {
+            final PreparedStatement ps = connection.prepareStatement(query,
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, response.getRequestId());
+            ps.setInt(2, response.getContractorId());
+            ps.setDate(3, date);
+            return ps;
+        };
+
+        jdbcTemplate.update(psc, keyHolder);
+
+        for (Map.Entry<String, Object> stringObjectEntry : keyHolder.getKeys().entrySet()) {
+            if (stringObjectEntry.getKey().equals("id")) {
+                return getResponseById(Integer.valueOf(stringObjectEntry.getValue().toString()));
+            }
+        }
+
+        return null;
     }
 
     public Response getResponseById(int id) {
         String query = "select * from response where id = ?";
-        return (Response) jdbcTemplate.queryForObject(query, new Object[]{id}, responseRowMapper);
-    }
-
-    public void deleteResponse(int id) {
-        String query = "delete from response where id = ?";
-        jdbcTemplate.update(query, id);
+        try {
+            return (Response) jdbcTemplate.queryForObject(query, new Object[]{id}, responseRowMapper);
+        } catch (Exception exception) {
+            return null;
+        }
     }
 
     public List<Response> getResponsesByRequestId(int requestId) {

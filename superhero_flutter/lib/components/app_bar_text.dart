@@ -8,7 +8,10 @@ class AppBarText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(this.text,
-        style: TextStyle(fontSize: 22, color: AppColors.HEADER_TEXT_COLOR));
+    return Container(
+      child: Text(this.text,
+          style: TextStyle(
+              fontSize: 22, color: AppColors.HEADER_TEXT_COLOR, height: 1)),
+    );
   }
 }

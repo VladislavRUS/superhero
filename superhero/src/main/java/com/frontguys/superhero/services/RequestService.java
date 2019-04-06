@@ -5,7 +5,6 @@ import com.frontguys.superhero.models.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,29 +18,8 @@ public class RequestService {
         return fillRequestListWithClientDetails(requestDAO.getAllRequests());
     }
 
-    public List<Request> getConfirmedRequests() {
-        List<Request> allRequests = requestDAO.getAllRequests();
-        List<Request> confirmedRequests = new ArrayList<>();
-
-        for (Request request: allRequests) {
-            if (request.isConfirmed()) {
-                confirmedRequests.add(request);
-            }
-        }
-
-        return fillRequestListWithClientDetails(confirmedRequests);
-    }
-
     public List<Request> getCustomerRequests(int customerId) {
         return fillRequestListWithClientDetails(requestDAO.getCustomerRequests(customerId));
-    }
-
-    public Request createRequest(Request request) {
-        return fillRequestWithClientDetails(requestDAO.createRequest(request));
-    }
-
-    public void updateRequest(int requestId, Request request) {
-        requestDAO.updateRequest(requestId, request);
     }
 
     public void confirmRequest(int requestId) {
@@ -57,7 +35,7 @@ public class RequestService {
     }
 
     public Request getRequestFromListById(List<Request> requests, int requestId) {
-        for (Request req: requests) {
+        for (Request req : requests) {
             if (req.getId() == requestId) {
                 return req;
             }
@@ -77,5 +55,17 @@ public class RequestService {
         }
 
         return requests;
+    }
+
+    public void assignRequest(int requestId, int contractorId) {
+        requestDAO.assignRequest(requestId, contractorId);
+    }
+
+    public void finishContractorRequest(int requestId) {
+        requestDAO.finishContractorRequest(requestId);
+    }
+
+    public void finishCustomerRequest(int requestId) {
+        requestDAO.finishCustomerRequest(requestId);
     }
 }

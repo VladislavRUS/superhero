@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:superhero_flutter/components/app_bar_text.dart';
+import 'package:superhero_flutter/components/info.dart';
+import 'package:superhero_flutter/constants/app_colors.dart';
 import 'package:superhero_flutter/models/client_details.dart';
 import 'package:superhero_flutter/store.dart';
 
@@ -17,14 +20,13 @@ class ProfileScreenState extends State<ProfileScreen> {
     ClientDetails clientDetails = store.clientDetails;
 
     if (clientDetails.isLegalEntity) {
-      fields.add(Text(clientDetails.companyName));
+      fields.add(Info(name: 'Компания', value: clientDetails.companyName));
     } else {
-      fields.add(Text(clientDetails.firstName));
-      fields.add(Text(clientDetails.lastName));
+      fields.add(Info(name: 'Имя', value: clientDetails.firstName));
+      fields.add(Info(name: 'Фамилия', value: clientDetails.lastName));
     }
 
-    fields.add(Text(clientDetails.email));
-    fields.add(Text(clientDetails.about));
+    fields.add(Info(name: 'Почта', value: clientDetails.email));
 
     return fields;
   }
@@ -33,10 +35,22 @@ class ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Профиль'),
+        elevation: 0.3,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppColors.HEADER_TEXT_COLOR,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+        title: AppBarText(text: 'Профиль'),
       ),
       body: Container(
+        padding: EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: getInfoFields(),
         ),
       ),

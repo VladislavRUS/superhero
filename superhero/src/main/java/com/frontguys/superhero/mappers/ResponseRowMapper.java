@@ -14,6 +14,8 @@ public class ResponseRowMapper implements RowMapper {
         response.setRequestId(resultSet.getInt("request_id"));
         response.setContractorId(resultSet.getInt("contractor_id"));
         response.setDate(resultSet.getDate("date"));
+        response.setPayment(resultSet.getInt("payment"));
+        response.setDate(resultSet.getDate("planned_date"));
         return response;
     }
 }

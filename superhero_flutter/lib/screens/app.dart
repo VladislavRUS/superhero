@@ -50,15 +50,18 @@ class AppScreenState extends State<AppScreen> {
   }
 
   Widget getRow() {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
-        Widget>[
-      bottomBarButton(
-          Icons.search, 'Заявки', () => setScreenIndex(0), isActiveScreen(0)),
-      bottomBarButton(
-          Icons.person, 'Профиль', () => setScreenIndex(2), isActiveScreen(2)),
-      bottomBarButton(Icons.settings, 'Настройки', () => setScreenIndex(3),
-          isActiveScreen(3)),
-    ]);
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          bottomBarButton(Icons.search, 'Заявки', () => setScreenIndex(0),
+              isActiveScreen(0)),
+          bottomBarButton(Icons.message, 'Отклики', () => setScreenIndex(1),
+              isActiveScreen(1)),
+          bottomBarButton(Icons.person, 'Профиль', () => setScreenIndex(2),
+              isActiveScreen(2)),
+          bottomBarButton(Icons.settings, 'Настройки', () => setScreenIndex(3),
+              isActiveScreen(3)),
+        ]);
   }
 
   setScreenIndex(int idx) {
@@ -76,8 +79,12 @@ class AppScreenState extends State<AppScreen> {
     return Scaffold(
       body: screens[screenIndex],
       bottomNavigationBar: BottomAppBar(
+        elevation: 0,
         child: Container(
           height: 60,
+          decoration: BoxDecoration(
+              border:
+                  Border(top: BorderSide(color: Color.fromARGB(20, 0, 0, 0)))),
           child: getRow(),
         ),
       ),
