@@ -16,7 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(value = "*")
 @RestController
@@ -79,7 +82,7 @@ public class RequestController {
         }
 
         if (request.getContractorId() == null) {
-            return new ResponseEntity<>("Is not assigned", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         }
 
         List<Response> responsesByRequestId = responseService.getResponsesByRequestId(requestId);
@@ -171,15 +174,51 @@ public class RequestController {
         Message message = new Message();
         message.setSystem(true);
 
-        if (ClientRoles.CONTRACTOR.equals(role)) {
+        if (ClientRoles.CONTRACTOR.equals(role) && !request.isFinishedByContractor()) {
             message.setText(SystemMessages.FINISH_CONTRACTOR);
             requestService.finishContractorRequest(requestId);
-        } else if (ClientRoles.CUSTOMER.equals(role)) {
+        } else if (ClientRoles.CUSTOMER.equals(role) && !request.isFinishedByCustomer()) {
             requestService.finishCustomerRequest(requestId);
             message.setText(SystemMessages.FINISH_CUSTOMER);
+        } else if (ClientRoles.ADMIN.equals(role) && !request.isApproved()) {
+            requestService.finishAdminRequest(requestId);
+            message.setText(SystemMessages.FINISH_ADMIN);
         }
 
         messageService.createMessageByRequest(message, request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/api/v1/auth/requests/{requestId}/pay/{responseId}", method = RequestMethod.POST)
+    public ResponseEntity<Object> pay(HttpServletRequest httpServletRequest, @PathVariable int requestId, @PathVariable int responseId) {
+        String token = httpServletRequest.getHeader("Authorization");
+        Client client = clientService.getClientByToken(token);
+        String role = client.getRole();
+
+        Request request = requestService.getRequestById(requestId);
+
+        if (!ClientRoles.CUSTOMER.equals(role)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        // Customer can see only his responses
+        if (ClientRoles.CUSTOMER.equals(role)) {
+            if (request.getCustomerId() != client.getId()) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+
+        Message message = new Message();
+        message.setSystem(true);
+
+        Response responseById = responseService.getResponseById(responseId);
+
+        Map<String, String> msgParams = new HashMap<>();
+
+        requestService.pay(requestId);
+        msgParams.put("money", String.valueOf(responseById.getPayment()));
+        messageService.createMessage(responseId, messageService.createMessageWithParams(SystemMessages.CUSTOMER_PAY, msgParams));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

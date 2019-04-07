@@ -17,6 +17,7 @@ public class Request {
     private boolean isFinishedByCustomer;
     private boolean isFinishedByContractor;
     private boolean isApproved;
+    private boolean isPayed;
     private int responseCount;
 
     public int getId() {
@@ -124,5 +125,14 @@ public class Request {
 
     public void setResponseCount(int responseCount) {
         this.responseCount = responseCount;
+    }
+
+    @JsonProperty(value = "isPayed")
+    public boolean isPayed() {
+        return isPayed;
+    }
+
+    public void setPayed(boolean payed) {
+        isPayed = payed;
     }
 }

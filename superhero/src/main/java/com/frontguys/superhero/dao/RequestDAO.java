@@ -62,4 +62,14 @@ public class RequestDAO {
         String query = "update request set is_finished_by_customer = true where id = ?";
         jdbcTemplate.update(query, requestId);
     }
+
+    public void finishAdminRequest(int requestId) {
+        String query = "update request set is_approved = true where id = ?";
+        jdbcTemplate.update(query, requestId);
+    }
+
+    public void pay(int requestId) {
+        String query = "update request set is_payed = true where id = ?";
+        jdbcTemplate.update(query, requestId);
+    }
 }

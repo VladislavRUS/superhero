@@ -27,9 +27,10 @@ public class ResponseDAO {
 //    }
 
     public Response createResponse(Response response) {
-        String query = "insert into response (request_id, contractor_id, date) values (?, ?, ?)";
+        String query = "insert into response (request_id, contractor_id, date, payment, planned_date) values (?, ?, ?, ?, ?)";
 
         java.sql.Date date = new java.sql.Date(new Date().getTime());
+        java.sql.Date plannedDate = new java.sql.Date(response.getPlannedDate().getTime());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -39,6 +40,8 @@ public class ResponseDAO {
             ps.setInt(1, response.getRequestId());
             ps.setInt(2, response.getContractorId());
             ps.setDate(3, date);
+            ps.setInt(4, response.getPayment());
+            ps.setDate(5, plannedDate);
             return ps;
         };
 

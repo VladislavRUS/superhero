@@ -68,4 +68,12 @@ public class RequestService {
     public void finishCustomerRequest(int requestId) {
         requestDAO.finishCustomerRequest(requestId);
     }
+
+    public void finishAdminRequest(int requestId) {
+        requestDAO.finishAdminRequest(requestId);
+    }
+
+    public void pay(int requestId) {
+        requestDAO.pay(requestId);
+    }
 }
